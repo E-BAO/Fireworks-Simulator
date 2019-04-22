@@ -1,1 +1,1 @@
-# Project: Fireworks Simulation
+# Project: Fireworks Simulator
