@@ -7,8 +7,8 @@
 #include <nanogui/nanogui.h>
 
 #include "camera.h"
-#include "cloth.h"
 #include "collision/collisionObject.h"
+#include "Firework.h"
 
 using namespace nanogui;
 
@@ -28,7 +28,6 @@ public:
 
 
     // Screen events
-
     virtual bool cursorPosCallbackEvent(double x, double y);
     virtual bool mouseButtonCallbackEvent(int button, int action, int modifiers);
     virtual bool keyCallbackEvent(int key, int scancode, int action, int mods);
@@ -40,12 +39,14 @@ private:
     virtual void initGUI(Screen *screen);
     void load_shaders();
 
+    // Default simulation values
+    vector<Firework*> fireworks;
+
     // File management
 
     std::string m_project_root;
 
     // Camera methods
-
     virtual void resetCamera();
     virtual Matrix4f getProjectionMatrix();
     virtual Matrix4f getViewMatrix();

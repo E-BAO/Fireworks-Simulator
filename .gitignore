@@ -10,3 +10,5 @@ CTestTestfile.cmake
 textures
 scene
 .DS_Store
+cmake-build-debug
+.idea

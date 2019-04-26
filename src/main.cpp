@@ -17,7 +17,7 @@
 #include "collision/sphere.h"
 //#include "cloth.h"
 //#include "clothSimulator.h"
-#include "json.hpp"
+//#include "json.hpp"
 #include "misc/file_utils.h"
 #include "FireworkSimulator.h"
 
@@ -26,7 +26,7 @@ typedef uint32_t gid_t;
 using namespace std;
 using namespace nanogui;
 
-using json = nlohmann::json;
+//using json = nlohmann::json;
 
 #define msg(s) cerr << "[ClothSim] " << s << endl;
 
@@ -157,6 +157,7 @@ void incompleteObjectError(const char *object, const char *attribute) {
   exit(-1);
 }
 
+/*
 bool loadObjectsFromFile(string filename, Cloth *cloth, ClothParameters *cp, vector<CollisionObject *>* objects, int sphere_num_lat, int sphere_num_lon) {
   // Read JSON from file
   ifstream i(filename);
@@ -361,9 +362,10 @@ bool loadObjectsFromFile(string filename, Cloth *cloth, ClothParameters *cp, vec
   }
 
   i.close();
-  
+
   return true;
 }
+*/
 
 bool is_valid_project_root(const std::string& search_path) {
     std::stringstream ss;
@@ -396,10 +398,9 @@ int main(int argc, char **argv) {
   std::string project_root;
   bool found_project_root = find_project_root(search_paths, project_root);
   
-  Cloth cloth;
-  ClothParameters cp;
-  vector<CollisionObject *> objects;
-  
+//  Cloth cloth;
+//  ClothParameters cp;
+
   int c;
   
   int sphere_num_lat = 40;
@@ -460,18 +461,18 @@ int main(int argc, char **argv) {
     file_to_load_from = def_fname.str();
   }
   
-  bool success = loadObjectsFromFile(file_to_load_from, &cloth, &cp, &objects, sphere_num_lat, sphere_num_lon);
-  if (!success) {
-    std::cout << "Warn: Unable to load from file: " << file_to_load_from << std::endl;
-  }
+//  bool success = loadObjectsFromFile(file_to_load_from, &cloth, &cp, &objects, sphere_num_lat, sphere_num_lon);
+//  if (!success) {
+//    std::cout << "Warn: Unable to load from file: " << file_to_load_from << std::endl;
+//  }
 
   glfwSetErrorCallback(error_callback);
 
   createGLContexts();
 
   // Initialize the Cloth object
-  cloth.buildGrid();
-  cloth.buildClothMesh();
+//  cloth.buildGrid();
+//  cloth.buildClothMesh();
 
   // Initialize the ClothSimulator object
   app = new FireworkSimulator(project_root, screen);

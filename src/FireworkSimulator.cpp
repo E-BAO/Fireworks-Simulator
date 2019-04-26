@@ -150,13 +150,15 @@ void FireworkSimulator::init() {
 void FireworkSimulator::drawContents() {
     glEnable(GL_DEPTH_TEST);
 
-//    if (!is_paused) {
-//        vector<Vector3D> external_accelerations = {gravity};
-//
-//        for (int i = 0; i < simulation_steps; i++) {
-//            cloth->simulate(frames_per_sec, simulation_steps, cp, external_accelerations, collision_objects);
-//        }
-//    }
+    if (!is_paused) {
+        vector<Vector3D> external_accelerations = {gravity};
+
+        for(Firework* f: fireworks){
+            for (int i = 0; i < simulation_steps; i++) {
+                f->simulate(frames_per_sec, simulation_steps, external_accelerations);
+            }
+        }
+    }
 
     // Bind the active shader
 
@@ -186,7 +188,7 @@ void FireworkSimulator::drawContents() {
         case NORMALS:
 //            drawNormals(shader);
             break;
-//        case PHONG:
+        case PHONG:
 //
 //            // Others
 //            Vector3D cam_pos = camera.position();
@@ -209,7 +211,7 @@ void FireworkSimulator::drawContents() {
 //
 //            shader.setUniform("u_texture_cubemap", 5, false);
 //            drawPhong(shader);
-//            break;
+            break;
     }
 
 //    for (CollisionObject *co : *collision_objects) {
