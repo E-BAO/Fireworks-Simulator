@@ -3,6 +3,7 @@
 
 #include <nanogui/nanogui.h>
 
+#include "../ray.h"
 #include "../clothMesh.h"
 #include "collisionObject.h"
 
@@ -17,7 +18,7 @@ public:
 
   void render(GLShader &shader);
   void collide(PointMass &pm);
-//  Vector3D intersect(const Ray &ray);
+  Vector3D intersect(const Ray &ray);
 
   Vector3D point;
   Vector3D normal;

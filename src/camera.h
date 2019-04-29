@@ -7,6 +7,7 @@
 #include "misc/camera_info.h"
 
 #include "math.h"
+#include "ray.h"
 
 namespace CGL {
 
@@ -71,6 +72,18 @@ public:
 
   virtual void dump_settings(std::string filename);
   virtual void load_settings(std::string filename);
+
+  /**
+   * Returns a world-space ray from the camera that corresponds to a
+   * ray exiting the camera that deposits light at the sensor plane
+   * position given by (x,y).  x and y are provided in the normalized
+   * coordinate space of the sensor.  For example (0.5, 0.5)
+   * corresponds to the middle of the screen.
+   *
+   * \param x x-coordinate of the ray sample in the view plane
+   * \param y y-coordinate of the ray sample in the view plane
+   */
+  Ray generate_ray(double x, double y) const;
 
 private:
   // Computes pos, screenXDir, screenYDir from target, r, phi, theta.

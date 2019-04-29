@@ -11,7 +11,6 @@ using namespace CGL;
 #define SURFACE_OFFSET 0.0001
 
 void Plane::collide(PointMass &pm) {
-  // TODO (Part 3): Handle collisions with planes.
     Vector3D p2p = pm.position - point;
     Vector3D lp2p = pm.last_position - point;
     if(dot(p2p, normal) * dot(lp2p, normal) < 0){
@@ -54,4 +53,8 @@ void Plane::render(GLShader &shader) {
   }
 
   shader.drawArray(GL_TRIANGLE_STRIP, 0, 4);
+}
+
+Vector3D Plane::intersect(const Ray &ray) {
+  return Vector3D();
 }
