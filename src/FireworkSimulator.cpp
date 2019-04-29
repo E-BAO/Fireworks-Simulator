@@ -74,12 +74,17 @@ void FireworkSimulator::load_shaders() {
         UserShader user_shader(shader_name, nanogui_shader, hint);
 
         shaders.push_back(user_shader);
-        shaders_combobox_names.push_back(shader_name);
+//        shaders_combobox_names.push_back(shader_name);
     }
+
+    vector<string> type_names = {"Simple", "Blinking", "Drawing"};
+    for(vector<string>::const_iterator iter = type_names.cbegin(); iter != type_names.cend(); iter++)
+        shaders_combobox_names.push_back(*iter);
+
 
     // Assuming that it's there, use "Wireframe" by default
     for (size_t i = 0; i < shaders_combobox_names.size(); ++i) {
-        if (shaders_combobox_names[i] == "Wireframe") {
+        if (shaders_combobox_names[i] == "Simple") {
             active_shader_idx = i;
             break;
         }
@@ -231,45 +236,13 @@ void FireworkSimulator::initGUI(Screen *screen) {
     // Firework Widget
 
     new Label(window, "Type", "sans-bold");
-    Widget *tools = new Widget(window);
-    tools->setLayout(new BoxLayout(Orientation::Horizontal,
-                                   Alignment::Middle, 0, 6));
 
     {
-        Button *b = new Button(tools, "1");
-        b->setFlags(Button::ToggleButton);
-        b->setPushed(true);
-        b->setFontSize(14);
-        b->setChangeCallback(
-                [this](bool state) {  });
-
-        b = new Button(tools, "2");
-        b->setFlags(Button::ToggleButton);
-        b->setPushed(false);
-        b->setFontSize(14);
-        b->setChangeCallback(
-                [this](bool state) { });
-
-        b = new Button(tools, "3");
-        b->setFlags(Button::ToggleButton);
-        b->setPushed(false);
-        b->setFontSize(14);
-        b->setChangeCallback(
-                [this](bool state) { });
-
-        b = new Button(tools, "4");
-        b->setFlags(Button::ToggleButton);
-        b->setPushed(false);
-        b->setFontSize(14);
-        b->setChangeCallback(
-            [this](bool state) { });
-
-        b = new Button(tools, "5");
-        b->setFlags(Button::ToggleButton);
-        b->setPushed(false);
-        b->setFontSize(14);
-        b->setChangeCallback(
-            [this](bool state) { });
+        ComboBox *cb = new ComboBox(window, shaders_combobox_names);
+        cb->setFontSize(14);
+        cb->setCallback(
+                [this, screen](int idx) { active_shader_idx = idx; });
+        cb->setSelectedIndex(active_shader_idx);
     }
 
     // Parameters
