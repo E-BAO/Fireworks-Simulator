@@ -372,8 +372,11 @@ bool FireworkSimulator::cursorPosCallbackEvent(double x, double y) {
     if (left_down && !middle_down && !right_down) {
         if (ctrl_down) {
             mouseRightDragged(x, y);
-        } else {
+        } else if (shift_down) {
             mouseLeftDragged(x, y);
+        } else {
+            // TODO: mouse picking
+
         }
     } else if (!left_down && !middle_down && right_down) {
         mouseRightDragged(x, y);
@@ -438,6 +441,8 @@ void FireworkSimulator::mouseRightDragged(double x, double y) {
 bool FireworkSimulator::keyCallbackEvent(int key, int scancode, int action,
                                       int mods) {
     ctrl_down = (bool)(mods & GLFW_MOD_CONTROL);
+    shift_down = (bool)(mods & GLFW_MOD_SHIFT);
+
 
     if (action == GLFW_PRESS) {
         switch (key) {

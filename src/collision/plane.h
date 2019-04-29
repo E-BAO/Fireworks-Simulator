@@ -17,6 +17,7 @@ public:
 
   void render(GLShader &shader);
   void collide(PointMass &pm);
+//  Vector3D intersect(const Ray &ray);
 
   Vector3D point;
   Vector3D normal;
