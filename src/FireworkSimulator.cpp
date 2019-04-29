@@ -149,6 +149,16 @@ void FireworkSimulator::init() {
 
     camera.configure(camera_info, screen_w, screen_h);
     canonicalCamera.configure(camera_info, screen_w, screen_h);
+
+    //init objects
+    collision_objects = new vector<CollisionObject *>();
+
+    //init plane
+    Vector3D point(0,0,0), normal(0,1,0);
+    double friction = 0.5;
+
+    Plane *p = new Plane(point, normal, friction);
+    collision_objects->push_back(p);
 }
 
 
@@ -219,9 +229,9 @@ void FireworkSimulator::drawContents() {
             break;
     }
 
-//    for (CollisionObject *co : *collision_objects) {
-//        co->render(shader);
-//    }
+    for (CollisionObject *co : *collision_objects) {
+        co->render(shader);
+    }
 }
 
 void FireworkSimulator::initGUI(Screen *screen) {
