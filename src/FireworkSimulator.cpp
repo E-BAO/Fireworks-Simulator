@@ -222,198 +222,57 @@ void FireworkSimulator::drawContents() {
 void FireworkSimulator::initGUI(Screen *screen) {
     Window *window;
 
-    window = new Window(screen, "Simulation");
-    window->setPosition(Vector2i(default_window_size(0) - 245, 15));
+    // Firework Widget
+
+    window = new Window(screen, "Firework");
+    window->setPosition(Vector2i(15, 15));
     window->setLayout(new GroupLayout(15, 6, 14, 5));
 
-    // Spring types
+    // Firework Widget
 
-    new Label(window, "Spring types", "sans-bold");
+    new Label(window, "Type", "sans-bold");
+    Widget *tools = new Widget(window);
+    tools->setLayout(new BoxLayout(Orientation::Horizontal,
+                                   Alignment::Middle, 0, 6));
 
     {
-        Button *b = new Button(window, "structural");
+        Button *b = new Button(tools, "1");
         b->setFlags(Button::ToggleButton);
         b->setPushed(true);
         b->setFontSize(14);
         b->setChangeCallback(
                 [this](bool state) {  });
 
-        b = new Button(window, "shearing");
+        b = new Button(tools, "2");
         b->setFlags(Button::ToggleButton);
-        b->setPushed(true);
+        b->setPushed(false);
         b->setFontSize(14);
         b->setChangeCallback(
                 [this](bool state) { });
 
-        b = new Button(window, "bending");
+        b = new Button(tools, "3");
         b->setFlags(Button::ToggleButton);
-        b->setPushed(true);
+        b->setPushed(false);
         b->setFontSize(14);
         b->setChangeCallback(
                 [this](bool state) { });
+
+        b = new Button(tools, "4");
+        b->setFlags(Button::ToggleButton);
+        b->setPushed(false);
+        b->setFontSize(14);
+        b->setChangeCallback(
+            [this](bool state) { });
+
+        b = new Button(tools, "5");
+        b->setFlags(Button::ToggleButton);
+        b->setPushed(false);
+        b->setFontSize(14);
+        b->setChangeCallback(
+            [this](bool state) { });
     }
 
-    // Mass-spring parameters
-
-    new Label(window, "Parameters", "sans-bold");
-
-    {
-        Widget *panel = new Widget(window);
-        GridLayout *layout =
-                new GridLayout(Orientation::Horizontal, 2, Alignment::Middle, 5, 5);
-        layout->setColAlignment({Alignment::Maximum, Alignment::Fill});
-        layout->setSpacing(0, 10);
-        panel->setLayout(layout);
-
-        new Label(panel, "density :", "sans-bold");
-
-        FloatBox<double> *fb = new FloatBox<double>(panel);
-        fb->setEditable(true);
-        fb->setFixedSize(Vector2i(100, 20));
-        fb->setFontSize(14);
-        fb->setValue(0);
-        fb->setUnits("g/cm^2");
-        fb->setSpinnable(true);
-        fb->setCallback([this](float value) { ; });
-
-        new Label(panel, "ks :", "sans-bold");
-
-        fb = new FloatBox<double>(panel);
-        fb->setEditable(true);
-        fb->setFixedSize(Vector2i(100, 20));
-        fb->setFontSize(14);
-        fb->setValue(10);
-        fb->setUnits("N/m");
-        fb->setSpinnable(true);
-        fb->setMinValue(0);
-        fb->setCallback([this](float value) { });
-    }
-
-    // Simulation constants
-
-    new Label(window, "Simulation", "sans-bold");
-
-    {
-        Widget *panel = new Widget(window);
-        GridLayout *layout =
-                new GridLayout(Orientation::Horizontal, 2, Alignment::Middle, 5, 5);
-        layout->setColAlignment({Alignment::Maximum, Alignment::Fill});
-        layout->setSpacing(0, 10);
-        panel->setLayout(layout);
-
-        new Label(panel, "frames/s :", "sans-bold");
-
-        IntBox<int> *fsec = new IntBox<int>(panel);
-        fsec->setEditable(true);
-        fsec->setFixedSize(Vector2i(100, 20));
-        fsec->setFontSize(14);
-        fsec->setValue(frames_per_sec);
-        fsec->setSpinnable(true);
-        fsec->setCallback([this](int value) { frames_per_sec = value; });
-
-        new Label(panel, "steps/frame :", "sans-bold");
-
-        IntBox<int> *num_steps = new IntBox<int>(panel);
-        num_steps->setEditable(true);
-        num_steps->setFixedSize(Vector2i(100, 20));
-        num_steps->setFontSize(14);
-        num_steps->setValue(simulation_steps);
-        num_steps->setSpinnable(true);
-        num_steps->setMinValue(0);
-        num_steps->setCallback([this](int value) { simulation_steps = value; });
-    }
-
-    // Damping slider and textbox
-
-    new Label(window, "Damping", "sans-bold");
-
-    {
-        Widget *panel = new Widget(window);
-        panel->setLayout(
-                new BoxLayout(Orientation::Horizontal, Alignment::Middle, 0, 5));
-
-        Slider *slider = new Slider(panel);
-        slider->setValue(33);
-        slider->setFixedWidth(105);
-
-        TextBox *percentage = new TextBox(panel);
-        percentage->setFixedWidth(75);
-        percentage->setValue(to_string(66));
-        percentage->setUnits("%");
-        percentage->setFontSize(14);
-
-        slider->setCallback([percentage](float value) {
-            percentage->setValue(std::to_string(value));
-        });
-        slider->setFinalCallback([&](float value) {
-//            cp->damping = (double)value;
-            // cout << "Final slider value: " << (int)(value * 100) << endl;
-        });
-    }
-
-    // Gravity
-
-    new Label(window, "Gravity", "sans-bold");
-
-    {
-        Widget *panel = new Widget(window);
-        GridLayout *layout =
-                new GridLayout(Orientation::Horizontal, 2, Alignment::Middle, 5, 5);
-        layout->setColAlignment({Alignment::Maximum, Alignment::Fill});
-        layout->setSpacing(0, 10);
-        panel->setLayout(layout);
-
-        new Label(panel, "x :", "sans-bold");
-
-        FloatBox<double> *fb = new FloatBox<double>(panel);
-        fb->setEditable(true);
-        fb->setFixedSize(Vector2i(100, 20));
-        fb->setFontSize(14);
-        fb->setValue(gravity.x);
-        fb->setUnits("m/s^2");
-        fb->setSpinnable(true);
-        fb->setCallback([this](float value) { gravity.x = value; });
-
-        new Label(panel, "y :", "sans-bold");
-
-        fb = new FloatBox<double>(panel);
-        fb->setEditable(true);
-        fb->setFixedSize(Vector2i(100, 20));
-        fb->setFontSize(14);
-        fb->setValue(gravity.y);
-        fb->setUnits("m/s^2");
-        fb->setSpinnable(true);
-        fb->setCallback([this](float value) { gravity.y = value; });
-
-        new Label(panel, "z :", "sans-bold");
-
-        fb = new FloatBox<double>(panel);
-        fb->setEditable(true);
-        fb->setFixedSize(Vector2i(100, 20));
-        fb->setFontSize(14);
-        fb->setValue(gravity.z);
-        fb->setUnits("m/s^2");
-        fb->setSpinnable(true);
-        fb->setCallback([this](float value) { gravity.z = value; });
-    }
-
-    window = new Window(screen, "Appearance");
-    window->setPosition(Vector2i(15, 15));
-    window->setLayout(new GroupLayout(15, 6, 14, 5));
-
-    // Appearance
-
-    {
-
-
-        ComboBox *cb = new ComboBox(window, shaders_combobox_names);
-        cb->setFontSize(14);
-        cb->setCallback(
-                [this, screen](int idx) { active_shader_idx = idx; });
-        cb->setSelectedIndex(active_shader_idx);
-    }
-
-    // Shader Parameters
+    // Parameters
 
     new Label(window, "Color", "sans-bold");
 
@@ -424,6 +283,8 @@ void FireworkSimulator::initGUI(Screen *screen) {
                 [this](const nanogui::Color &color) { this->color = color; });
     }
 
+    // Firework parameters
+
     new Label(window, "Parameters", "sans-bold");
 
     {
@@ -434,24 +295,27 @@ void FireworkSimulator::initGUI(Screen *screen) {
         layout->setSpacing(0, 10);
         panel->setLayout(layout);
 
-        new Label(panel, "Normal :", "sans-bold");
+        new Label(panel, "duration :", "sans-bold");
 
         FloatBox<double> *fb = new FloatBox<double>(panel);
         fb->setEditable(true);
         fb->setFixedSize(Vector2i(100, 20));
         fb->setFontSize(14);
-        fb->setValue(99);
+        fb->setValue(1);
+        fb->setUnits("s");
         fb->setSpinnable(true);
-        fb->setCallback([this](float value) { });
+        fb->setCallback([this](float value) { ; });
 
-        new Label(panel, "Height :", "sans-bold");
+        new Label(panel, "size :", "sans-bold");
 
         fb = new FloatBox<double>(panel);
         fb->setEditable(true);
         fb->setFixedSize(Vector2i(100, 20));
         fb->setFontSize(14);
-        fb->setValue(99);
+        fb->setValue(50);
+        fb->setUnits("pixel");
         fb->setSpinnable(true);
+        fb->setMinValue(0);
         fb->setCallback([this](float value) { });
     }
 }
