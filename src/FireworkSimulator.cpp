@@ -33,63 +33,30 @@ void FireworkSimulator::load_shaders() {
     std::cout << "Error: Could not find the shaders folder!" << std::endl;
   }
 
-  std::string std_vert_shader = m_project_root + "/shaders/Default.vert";
+  std::string shader_name = "Simple";
+  std::string shader_fname = "Simple.frag";
+  std::string vert_shader = m_project_root + "/shaders/Simple.vert";
 
-  for (const std::string &shader_fname : shader_folder_contents) {
-    std::string file_extension;
-    std::string shader_name;
+  GLShader nanogui_shader;
+  nanogui_shader.initFromFiles(shader_name, vert_shader,
+                               m_project_root + "/shaders/" + shader_fname);
 
-    FileUtils::split_filename(shader_fname, shader_name, file_extension);
+  ShaderTypeHint hint = ShaderTypeHint::SIMPLE;
+  UserShader user_shader(shader_name, nanogui_shader, hint);
 
-    if (file_extension != "frag") {
-      std::cout << "Skipping non-shader file: " << shader_fname << std::endl;
-      continue;
-    }
-
-    std::cout << "Found shader file: " << shader_fname << std::endl;
-
-    // Check if there is a proper .vert shader or not for it
-    std::string vert_shader = std_vert_shader;
-    std::string associated_vert_shader_path = m_project_root + "/shaders/" + shader_name + ".vert";
-    if (FileUtils::file_exists(associated_vert_shader_path)) {
-      vert_shader = associated_vert_shader_path;
-    }
-
-    GLShader nanogui_shader;
-    nanogui_shader.initFromFiles(shader_name, vert_shader,
-                                 m_project_root + "/shaders/" + shader_fname);
-
-    // Special filenames are treated a bit differently
-    ShaderTypeHint hint;
-    if (shader_name == "Simple") {
-      hint = ShaderTypeHint::SIMPLE;
-      std::cout << "Type: Simple" << std::endl;
-    } else if (shader_name == "Normal") {
-      hint = ShaderTypeHint::NORMALS;
-      std::cout << "Type: Normal" << std::endl;
-    } else {
-      hint = ShaderTypeHint::PHONG;
-      std::cout << "Type: Custom" << std::endl;
-    }
-
-    UserShader user_shader(shader_name, nanogui_shader, hint);
-
-    shaders.push_back(user_shader);
-    shaders_combobox_names.push_back(shader_name);
-  }
-
-//    vector<string> type_names = {"Simple", "Blinking", "Drawing"};
-//    for(vector<string>::const_iterator iter = type_names.cbegin(); iter != type_names.cend(); iter++)
-//        shaders_combobox_names.push_back(*iter);
+  shaders.push_back(user_shader);
 
 
-  // Assuming that it's there, use "Wireframe" by default
-  for (size_t i = 0; i < shaders_combobox_names.size(); ++i) {
-    if (shaders_combobox_names[i] == "Simple") {
-      active_shader_idx = i;
-      break;
-    }
-  }
+  vector<string> type_names = {"Simple", "Blinking", "Drawing"};
+  for (vector<string>::const_iterator iter = type_names.cbegin(); iter != type_names.cend(); iter++)
+    types_combobox_names.push_back(*iter);
+
+//  for (size_t i = 0; i < types_combobox_names.size(); ++i) {
+//    if (types_combobox_names[i] == "Simple") {
+//      active_type_idx = i;
+//      break;
+//    }
+//  }
 }
 
 FireworkSimulator::FireworkSimulator(std::string project_root, Screen *screen) : m_project_root(project_root) {
@@ -178,7 +145,7 @@ void FireworkSimulator::drawContents() {
 
   // Bind the active shader
 
-  const UserShader &active_shader = shaders[active_shader_idx];
+  const UserShader &active_shader = shaders[0];
 
   GLShader shader = active_shader.nanogui_shader;
   shader.bind();
@@ -196,39 +163,8 @@ void FireworkSimulator::drawContents() {
   shader.setUniform("u_model", model);
   shader.setUniform("u_view_projection", viewProjection);
 
-  switch (active_shader.type_hint) {
-    case SIMPLE:
-      shader.setUniform("u_color", color, false);
-      drawWireframe(shader);
-      break;
-    case NORMALS:
-//            drawNormals(shader);
-      break;
-    case PHONG:
-//
-//            // Others
-//            Vector3D cam_pos = camera.position();
-//            shader.setUniform("u_color", color, false);
-//            shader.setUniform("u_cam_pos", Vector3f(cam_pos.x, cam_pos.y, cam_pos.z), false);
-//            shader.setUniform("u_light_pos", Vector3f(0.5, 2, 2), false);
-//            shader.setUniform("u_light_intensity", Vector3f(3, 3, 3), false);
-//            shader.setUniform("u_texture_1_size", Vector2f(m_gl_texture_1_size.x, m_gl_texture_1_size.y), false);
-//            shader.setUniform("u_texture_2_size", Vector2f(m_gl_texture_2_size.x, m_gl_texture_2_size.y), false);
-//            shader.setUniform("u_texture_3_size", Vector2f(m_gl_texture_3_size.x, m_gl_texture_3_size.y), false);
-//            shader.setUniform("u_texture_4_size", Vector2f(m_gl_texture_4_size.x, m_gl_texture_4_size.y), false);
-//            // Textures
-//            shader.setUniform("u_texture_1", 1, false);
-//            shader.setUniform("u_texture_2", 2, false);
-//            shader.setUniform("u_texture_3", 3, false);
-//            shader.setUniform("u_texture_4", 4, false);
-//
-//            shader.setUniform("u_normal_scaling", m_normal_scaling, false);
-//            shader.setUniform("u_height_scaling", m_height_scaling, false);
-//
-//            shader.setUniform("u_texture_cubemap", 5, false);
-//            drawPhong(shader);
-      break;
-  }
+  shader.setUniform("u_color", color, false);
+  drawWireframe(shader);
 
   for (CollisionObject *co : *collision_objects) {
     co->render(shader);
@@ -289,11 +225,11 @@ void FireworkSimulator::initGUI(Screen *screen) {
   new Label(window, "Type", "sans-bold");
 
   {
-    ComboBox *cb = new ComboBox(window, shaders_combobox_names);
+    ComboBox *cb = new ComboBox(window, types_combobox_names);
     cb->setFontSize(14);
     cb->setCallback(
-        [this, screen](int idx) { active_shader_idx = idx; });
-    cb->setSelectedIndex(active_shader_idx);
+        [this, screen](int idx) { active_type_idx = idx; });
+    cb->setSelectedIndex(active_type_idx);
   }
 
   // Parameters

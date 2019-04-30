@@ -69,10 +69,10 @@ private:
 
     // OpenGL attributes
 
-    int active_shader_idx = 0;
+    int active_type_idx = 0;
 
     vector<UserShader> shaders;
-    vector<std::string> shaders_combobox_names;
+    vector<std::string> types_combobox_names;
 
 
     // Camera attributes
