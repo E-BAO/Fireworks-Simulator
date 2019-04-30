@@ -30,7 +30,8 @@ public:
 
     FireworkStatus status;
     vector<FireParticle> particles;
-    FireParticle* ignitParticle;
+    FireParticle* igniteParticle;
+    nanogui::Color color;
 
 private:
     float density;

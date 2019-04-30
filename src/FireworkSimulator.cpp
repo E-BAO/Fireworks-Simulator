@@ -245,28 +245,32 @@ void FireworkSimulator::drawWireframe(GLShader &shader) {
         else if(f->status == IGNITING)
             num_particles ++;
     }
-//    std::cout<<"drawWireframe num_particles  == "<<num_particles<<std::endl;
 
     MatrixXf positions(4, num_particles);
+    MatrixXf colors(4, num_particles);
 
     int si = 0;
     for(auto f: fireworks){
         if(f->status == DIED)
             continue;
+        nanogui::Color color = f->color;
         if(f->status == EXPLODING){
             for(FireParticle& p: f->particles){
                 Vector3D pos = p.position;
                 positions.col(si) << pos.x, pos.y, pos.z, 1.0;
+                color.col(si) << color.r(), color.g(), color.b(), p.alpha;
                 si ++;
             }
         }
         else if(f->status == IGNITING){
-            Vector3D pos = f->ignitParticle->position;
+            Vector3D pos = f->igniteParticle->position;
             positions.col(si) << pos.x, pos.y, pos.z, 1.0;
+            colors.col(si) << color.r(), color.g(), color.b(), f->igniteParticle->alpha;
             si ++;
         }
     }
     shader.uploadAttrib("in_position", positions, false);
+    shader.uploadAttrib("in_color", colors, false);
 
     shader.drawArray(GL_POINTS, 0, num_particles);
 }
@@ -511,6 +515,7 @@ bool FireworkSimulator::keyCallbackEvent(int key, int scancode, int action,
             case 'O':
                 std::cout<< " press o add fireworks "<<std::endl;
                 Firework *f = new Firework(Vector3D(0,0,0), Vector3D(0,2,0));
+                f->color = nanogui::Color(1.0f, 1.0f, 0.0f, 1.0f);
                 fireworks.push_back(f);
                 drawContents();
                 break;
