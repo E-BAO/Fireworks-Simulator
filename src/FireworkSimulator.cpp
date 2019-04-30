@@ -460,7 +460,7 @@ bool FireworkSimulator::mouseButtonCallbackEvent(int button, int action,
                         if (plane->intersect(ray, isect)) {
                             Vector3D isect_pos = ray.o + ray.d * isect->t;
 //                            cout << isect_pos << endl;
-                            Firework *f = new Firework(isect_pos, Vector3D(0,2,0));
+                            Firework *f = new Firework(isect_pos, Vector3D(0,5,0));
                             f->color = nanogui::Color(1.0f, 1.0f, 0.0f, 1.0f);
                             fireworks.push_back(f);
                             drawContents();
