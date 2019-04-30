@@ -196,14 +196,14 @@ void FireworkSimulator::drawContents() {
     shader.setUniform("u_view_projection", viewProjection);
 
     switch (active_shader.type_hint) {
-        case WIREFRAME:
+        case PHONG:
             shader.setUniform("u_color", color, false);
-//            drawWireframe(shader);
+            drawWireframe(shader);
             break;
         case NORMALS:
 //            drawNormals(shader);
             break;
-        case PHONG:
+        case WIREFRAME:
 //
 //            // Others
 //            Vector3D cam_pos = camera.position();
@@ -230,8 +230,49 @@ void FireworkSimulator::drawContents() {
     }
 
     for (CollisionObject *co : *collision_objects) {
-        co->render(shader);
+//        co->render(shader);
     }
+}
+
+void FireworkSimulator::drawWireframe(GLShader &shader) {
+
+    int num_particles = 0;
+    for(auto f: fireworks){
+        if(f->status == DIED)
+            continue;
+        if(f->status == EXPLODING)
+            num_particles += f->particles.size();
+        else if(f->status == IGNITING)
+            num_particles ++;
+    }
+
+    MatrixXf positions(4, num_particles);
+    MatrixXf colors(4, num_particles);
+
+    int si = 0;
+    for(auto f: fireworks){
+        if(f->status == DIED)
+            continue;
+        nanogui::Color color = f->color;
+        if(f->status == EXPLODING){
+            for(FireParticle& p: f->particles){
+                Vector3D pos = p.position;
+                positions.col(si) << pos.x, pos.y, pos.z, 1.0;
+                color.col(si) << color.r(), color.g(), color.b(), p.alpha;
+                si ++;
+            }
+        }
+        else if(f->status == IGNITING){
+            Vector3D pos = f->igniteParticle->position;
+            positions.col(si) << pos.x, pos.y, pos.z, 1.0;
+            colors.col(si) << color.r(), color.g(), color.b(), f->igniteParticle->alpha;
+            si ++;
+        }
+    }
+    shader.uploadAttrib("in_position", positions, false);
+    shader.uploadAttrib("in_color", colors, false);
+
+    shader.drawArray(GL_POINTS, 0, num_particles);
 }
 
 void FireworkSimulator::initGUI(Screen *screen) {
@@ -461,6 +502,16 @@ bool FireworkSimulator::keyCallbackEvent(int key, int scancode, int action,
                     drawContents();
                     is_paused = true;
                 }
+                break;
+
+            // Yiwen debug
+            case 'o':
+            case 'O':
+                std::cout<< " press o add fireworks "<<std::endl;
+                Firework *f = new Firework(Vector3D(0,0,0), Vector3D(0,2,0));
+                f->color = nanogui::Color(1.0f, 1.0f, 0.0f, 1.0f);
+                fireworks.push_back(f);
+                drawContents();
                 break;
         }
     }

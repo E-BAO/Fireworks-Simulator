@@ -25,4 +25,5 @@ void main() {
   v_uv = in_uv;
   v_tangent = normalize(u_model * in_tangent);
   gl_Position = u_view_projection * u_model * in_position;
+  gl_PointSize = 10.0;
 }

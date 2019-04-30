@@ -37,5 +37,5 @@ void main() {
 
 	float r2 = 1.0 / dot(lightVec, lightVec);
 
-	out_color = u_color * vec4(u_light_intensity * r2 * kd, 1);
+	out_color = vec4(0, 1, 1, 0);//u_color * vec4(u_light_intensity * r2 * kd, 1);
 }

@@ -41,6 +41,7 @@ private:
 
     // Default simulation values
     vector<Firework*> fireworks;
+    void drawWireframe(GLShader &shader);
 
     // File management
 

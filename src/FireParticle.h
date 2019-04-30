@@ -13,7 +13,7 @@
 using namespace CGL;
 
 struct FireParticle {
-    FireParticle(Vector3D position = Vector3D(0,0,0), Vector3D velocity = Vector3D(0,1,0), float mass = 1.0)
+    FireParticle(Vector3D position = Vector3D(0,0,0), Vector3D velocity = Vector3D(0,0,0), float mass = 1.0)
             : start_position(position), position(position), velocity(velocity), mass(mass){}
 
     // static values

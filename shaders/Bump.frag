@@ -91,6 +91,6 @@ void main() {
   	vec4 specularColor = min(u_color + 0.2, 1.0);
 	vec3 specular = u_light_intensity * r2 * ks * pow(max(specularDot, 0.0),p);
 
-	out_color = u_color * vec4(diffuse + ambient + specular, 1);
+	out_color = vec4(0,0,1,1);//u_color * vec4(diffuse + ambient + specular, 1);
 }
 
