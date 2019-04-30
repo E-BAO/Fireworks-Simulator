@@ -461,7 +461,7 @@ bool FireworkSimulator::mouseButtonCallbackEvent(int button, int action,
                             Vector3D isect_pos = ray.o + ray.d * isect->t;
 //                            cout << isect_pos << endl;
                             Firework *f = new Firework(isect_pos, Vector3D(0,5,0));
-                            f->color = nanogui::Color(1.0f, 1.0f, 0.0f, 1.0f);
+                            f->color = this->color;
                             fireworks.push_back(f);
                             drawContents();
                         }
@@ -528,7 +528,7 @@ bool FireworkSimulator::keyCallbackEvent(int key, int scancode, int action,
             case 'O':
                 std::cout<< " press o add fireworks "<<std::endl;
                 Firework *f = new Firework(Vector3D(0,0,0), Vector3D(0,2,0));
-                f->color = nanogui::Color(1.0f, 1.0f, 0.0f, 1.0f);
+                f->color = this->color;
                 fireworks.push_back(f);
                 drawContents();
                 break;
