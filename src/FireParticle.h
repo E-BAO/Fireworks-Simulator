@@ -24,7 +24,6 @@ struct FireParticle {
     Vector3D forces;
     float lifetime = 1.0;
     Vector3D velocity;
-    float alpha = 1.0;
 };
 
 #endif //CLOTHSIM_FIREPARTICLE_H

@@ -259,13 +259,13 @@ void FireworkSimulator::drawWireframe(GLShader &shader) {
       for (FireParticle &p: f->particles) {
         Vector3D pos = p.position;
         positions.col(si) << pos.x, pos.y, pos.z, 1.0;
-        colors.col(si) << color.r(), color.g(), color.b(), p.alpha;
+        colors.col(si) << color.r(), color.g(), color.b(), p.lifetime;
         si++;
       }
     } else if (f->status == IGNITING) {
       Vector3D pos = f->igniteParticle->position;
       positions.col(si) << pos.x, pos.y, pos.z, 1.0;
-      colors.col(si) << color.r(), color.g(), color.b(), f->igniteParticle->alpha;
+      colors.col(si) << color.r(), color.g(), color.b(), f->igniteParticle->lifetime;
       si++;
     }
   }
