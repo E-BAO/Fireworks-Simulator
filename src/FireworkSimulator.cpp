@@ -452,7 +452,10 @@ bool FireworkSimulator::mouseButtonCallbackEvent(int button, int action,
                     left_down = false;
                     if (clock() - last_click < click_duration) {
                         // shoot ray
-                        Ray ray = camera.generate_ray(mouse_x * 2. / screen_w, mouse_y * 2. / screen_h);
+                        Ray ray = camera.generate_ray(mouse_x * screen->pixelRatio() / screen_w,
+                            mouse_y * screen->pixelRatio() / screen_h);
+                        cout << mouse_x * screen->pixelRatio() / screen_w << " " <<
+                        mouse_y * screen->pixelRatio() / screen_h << endl;
                         Intersection *isect = new Intersection();
                         if (plane->intersect(ray, isect)) {
                             Vector3D isect_pos = ray.o + ray.d * isect->t;
