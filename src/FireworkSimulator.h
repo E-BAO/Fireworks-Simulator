@@ -9,6 +9,7 @@
 #include "camera.h"
 #include "collision/collisionObject.h"
 #include "Firework.h"
+#include "collision/plane.h"
 
 using namespace nanogui;
 
@@ -98,6 +99,8 @@ private:
     // Keyboard flags
 
     bool ctrl_down = false;
+    clock_t last_click = 0;
+    int click_duration = 40000;
 
     // Simulation flags
 
@@ -112,6 +115,7 @@ private:
     int screen_h;
 
     bool is_alive = true;
+    Plane *plane;
 
     Vector2i default_window_size = Vector2i(1024, 800);
 };

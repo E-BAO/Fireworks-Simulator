@@ -90,7 +90,7 @@ bool Plane::intersectTriangle(const Ray &r, Intersection *isect,
 bool Plane::intersect(const Ray &r, Intersection *isect) {
   if (intersectTriangle(r, isect, p0, p1, p2))
     return true;
-  if (intersectTriangle(r, isect, p1, p2, p3))
+  if (intersectTriangle(r, isect, p0, p2, p3))
     return true;
   return false;
 }

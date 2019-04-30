@@ -14,7 +14,7 @@
 #include "camera.h"
 #include "cloth.h"
 #include "collision/plane.h"
-#include "collision/sphere.h"
+#include "collision/intersection.h"
 #include "misc/camera_info.h"
 #include "misc/file_utils.h"
 // Needed to generate stb_image binaries. Should only define in exactly one source file importing stb_image.h.
@@ -157,8 +157,9 @@ void FireworkSimulator::init() {
     Vector3D point(0,0,0), normal(0,1,0);
     double friction = 0.5;
 
-    Plane *p = new Plane(point, normal, friction);
-    collision_objects->push_back(p);
+    plane = new Plane(point, normal, friction);
+    collision_objects->push_back(plane);
+//    cout <<plane->p0 << " "<<plane->p1 << " "<<plane->p2<<" "<<plane->p3<<endl;
 }
 
 
@@ -230,7 +231,7 @@ void FireworkSimulator::drawContents() {
     }
 
     for (CollisionObject *co : *collision_objects) {
-//        co->render(shader);
+        co->render(shader);
     }
 }
 
@@ -434,6 +435,7 @@ bool FireworkSimulator::mouseButtonCallbackEvent(int button, int action,
             switch (button) {
                 case GLFW_MOUSE_BUTTON_LEFT:
                     left_down = true;
+                    last_click = clock();
                     break;
                 case GLFW_MOUSE_BUTTON_MIDDLE:
                     middle_down = true;
@@ -448,6 +450,20 @@ bool FireworkSimulator::mouseButtonCallbackEvent(int button, int action,
             switch (button) {
                 case GLFW_MOUSE_BUTTON_LEFT:
                     left_down = false;
+                    if (clock() - last_click < click_duration) {
+                        // shoot ray
+                        Ray ray = camera.generate_ray(mouse_x * 2. / screen_w, mouse_y * 2. / screen_h);
+                        Intersection *isect = new Intersection();
+                        if (plane->intersect(ray, isect)) {
+                            Vector3D isect_pos = ray.o + ray.d * isect->t;
+//                            cout << isect_pos << endl;
+                            Firework *f = new Firework(isect_pos, Vector3D(0,2,0));
+                            f->color = nanogui::Color(1.0f, 1.0f, 0.0f, 1.0f);
+                            fireworks.push_back(f);
+                            drawContents();
+                        }
+                    }
+                    break;
                 case GLFW_MOUSE_BUTTON_MIDDLE:
                     middle_down = false;
                     break;
