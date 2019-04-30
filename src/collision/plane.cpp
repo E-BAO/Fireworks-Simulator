@@ -33,6 +33,7 @@ void Plane::render(GLShader &shader) {
 
   MatrixXf positions(3, 4);
   MatrixXf normals(3, 4);
+  MatrixXf colors(4, 4);
 
   positions.col(0) << sPoint + 2 * (sCross + sParallel);
   positions.col(1) << sPoint + 2 * (sCross - sParallel);
@@ -44,12 +45,20 @@ void Plane::render(GLShader &shader) {
   normals.col(2) << sNormal;
   normals.col(3) << sNormal;
 
+  colors.col(0) << color.r() , color.g() , color.b() , 1.0;
+  colors.col(1) << color.r() , color.g() , color.b() , 1.0;
+  colors.col(2) << color.r() , color.g() , color.b() , 1.0;
+  colors.col(3) << color.r() , color.g() , color.b() , 1.0;
+
   if (shader.uniform("u_color", false) != -1) {
-    shader.setUniform("u_color", color);
+      shader.setUniform("u_color", color);
   }
   shader.uploadAttrib("in_position", positions);
   if (shader.attrib("in_normal", false) != -1) {
-    shader.uploadAttrib("in_normal", normals);
+      shader.uploadAttrib("in_normal", normals);
+  }
+  if (shader.attrib("in_color", false) != -1) {
+      shader.uploadAttrib("in_color", colors);
   }
 
   shader.drawArray(GL_TRIANGLE_STRIP, 0, 4);
