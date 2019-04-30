@@ -60,6 +60,10 @@ private:
 
     CGL::Vector3D gravity = CGL::Vector3D(0, -9.8, 0);
     nanogui::Color color = nanogui::Color(1.0f, 1.0f, 1.0f, 1.0f);
+    float speed = 5;
+    float density = 15;
+    float energy = 3;
+    float damping = 1;
 
     vector<CollisionObject *> *collision_objects;
 

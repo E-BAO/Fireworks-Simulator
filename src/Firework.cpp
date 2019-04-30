@@ -47,7 +47,7 @@ void Firework::simulate(double frames_per_sec, double simulation_steps, vector<V
             }
             p.position += p.velocity * delta_t;
             //add damping here  in or out ???
-            Vector3D dampAc = -(p.velocity).unit() * damping;
+            Vector3D dampAc = -(p.velocity).unit() * damping * damping;
             p.velocity += dampAc * delta_t;
             p.position += dampAc * pow(delta_t, 2);
             //add ac here
