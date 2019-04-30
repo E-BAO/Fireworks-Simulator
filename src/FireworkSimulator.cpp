@@ -60,9 +60,9 @@ void FireworkSimulator::load_shaders() {
 
         // Special filenames are treated a bit differently
         ShaderTypeHint hint;
-        if (shader_name == "Wireframe") {
-            hint = ShaderTypeHint::WIREFRAME;
-            std::cout << "Type: Wireframe" << std::endl;
+        if (shader_name == "Simple") {
+            hint = ShaderTypeHint::SIMPLE;
+            std::cout << "Type: Simple" << std::endl;
         } else if (shader_name == "Normal") {
             hint = ShaderTypeHint::NORMALS;
             std::cout << "Type: Normal" << std::endl;
@@ -74,12 +74,12 @@ void FireworkSimulator::load_shaders() {
         UserShader user_shader(shader_name, nanogui_shader, hint);
 
         shaders.push_back(user_shader);
-//        shaders_combobox_names.push_back(shader_name);
+        shaders_combobox_names.push_back(shader_name);
     }
 
-    vector<string> type_names = {"Simple", "Blinking", "Drawing"};
-    for(vector<string>::const_iterator iter = type_names.cbegin(); iter != type_names.cend(); iter++)
-        shaders_combobox_names.push_back(*iter);
+//    vector<string> type_names = {"Simple", "Blinking", "Drawing"};
+//    for(vector<string>::const_iterator iter = type_names.cbegin(); iter != type_names.cend(); iter++)
+//        shaders_combobox_names.push_back(*iter);
 
 
     // Assuming that it's there, use "Wireframe" by default
@@ -197,14 +197,14 @@ void FireworkSimulator::drawContents() {
     shader.setUniform("u_view_projection", viewProjection);
 
     switch (active_shader.type_hint) {
-        case PHONG:
+        case SIMPLE:
             shader.setUniform("u_color", color, false);
             drawWireframe(shader);
             break;
         case NORMALS:
 //            drawNormals(shader);
             break;
-        case WIREFRAME:
+        case PHONG:
 //
 //            // Others
 //            Vector3D cam_pos = camera.position();
