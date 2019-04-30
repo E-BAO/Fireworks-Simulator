@@ -343,7 +343,6 @@ Matrix4f FireworkSimulator::getViewMatrix() {
     lookAt.setZero();
 
     // Convert CGL vectors to Eigen vectors
-    // TODO: Find a better way to do this!
 
     CGL::Vector3D c_pos = camera.position();
     CGL::Vector3D c_udir = camera.up_dir();
@@ -372,11 +371,8 @@ bool FireworkSimulator::cursorPosCallbackEvent(double x, double y) {
     if (left_down && !middle_down && !right_down) {
         if (ctrl_down) {
             mouseRightDragged(x, y);
-        } else if (shift_down) {
-            mouseLeftDragged(x, y);
         } else {
-            // TODO: mouse picking
-
+            mouseLeftDragged(x, y);
         }
     } else if (!left_down && !middle_down && right_down) {
         mouseRightDragged(x, y);
@@ -411,7 +407,6 @@ bool FireworkSimulator::mouseButtonCallbackEvent(int button, int action,
             switch (button) {
                 case GLFW_MOUSE_BUTTON_LEFT:
                     left_down = false;
-                    break;
                 case GLFW_MOUSE_BUTTON_MIDDLE:
                     middle_down = false;
                     break;
@@ -441,7 +436,6 @@ void FireworkSimulator::mouseRightDragged(double x, double y) {
 bool FireworkSimulator::keyCallbackEvent(int key, int scancode, int action,
                                       int mods) {
     ctrl_down = (bool)(mods & GLFW_MOD_CONTROL);
-    shift_down = (bool)(mods & GLFW_MOD_SHIFT);
 
 
     if (action == GLFW_PRESS) {

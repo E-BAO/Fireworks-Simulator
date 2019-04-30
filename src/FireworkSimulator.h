@@ -97,7 +97,6 @@ private:
     // Keyboard flags
 
     bool ctrl_down = false;
-    bool shift_down = false;
 
     // Simulation flags
 
