@@ -13,11 +13,13 @@ in vec4 in_position;
 in vec4 in_normal;
 in vec4 in_tangent;
 in vec2 in_uv;
+in vec4 in_color;
 
 out vec4 v_position;
 out vec4 v_normal;
 out vec2 v_uv;
 out vec4 v_tangent;
+out vec4 v_color;
 
 void main() {
   v_position = u_model * in_position;
@@ -26,4 +28,5 @@ void main() {
   v_tangent = normalize(u_model * in_tangent);
   gl_Position = u_view_projection * u_model * in_position;
   gl_PointSize = 10.0;
+  v_color = in_color;
 }

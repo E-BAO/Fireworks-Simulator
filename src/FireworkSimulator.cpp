@@ -258,7 +258,7 @@ void FireworkSimulator::drawWireframe(GLShader &shader) {
             for(FireParticle& p: f->particles){
                 Vector3D pos = p.position;
                 positions.col(si) << pos.x, pos.y, pos.z, 1.0;
-                color.col(si) << color.r(), color.g(), color.b(), p.alpha;
+                colors.col(si) << color.r(), color.g(), color.b(), p.alpha;
                 si ++;
             }
         }
