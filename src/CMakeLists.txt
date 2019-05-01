@@ -24,7 +24,7 @@ set(CLOTHSIM_VIEWER_SOURCE
     misc/file_utils.cpp
 
     # Camera
-    camera.cpp FireParticle.cpp)
+    camera.cpp FireParticle.cpp ExplosionParticle.cpp ExplosionParticle.h)
 
 # Windows-only sources
 if(WIN32)
