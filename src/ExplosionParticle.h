@@ -20,6 +20,10 @@ class ExplosionParticle {
   float cm;    // thermal mass
   float H;    // heat energy
   float lifetime = 1.0;    // life time
+  float r;    // radius
+
+  const float drag = 1.0;    // drag coefficient
+  const float conductivity = 1.0;    // thermal conductivity
 
 };
 
