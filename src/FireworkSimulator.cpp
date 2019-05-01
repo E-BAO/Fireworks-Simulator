@@ -51,12 +51,6 @@ void FireworkSimulator::load_shaders() {
   for (vector<string>::const_iterator iter = type_names.cbegin(); iter != type_names.cend(); iter++)
     types_combobox_names.push_back(*iter);
 
-//  for (size_t i = 0; i < types_combobox_names.size(); ++i) {
-//    if (types_combobox_names[i] == "Simple") {
-//      active_type_idx = i;
-//      break;
-//    }
-//  }
 }
 
 FireworkSimulator::FireworkSimulator(std::string project_root, Screen *screen) : m_project_root(project_root) {
@@ -245,6 +239,57 @@ void FireworkSimulator::initGUI(Screen *screen) {
 
   // Firework parameters
 
+  new Label(window, "Density", "sans-bold");
+
+  {
+    Widget *panel = new Widget(window);
+    panel->setLayout(
+        new BoxLayout(Orientation::Horizontal, Alignment::Middle, 0, 5));
+
+    Slider *slider = new Slider(panel);
+    slider->setValue(density / 2000);
+    slider->setFixedWidth(105);
+
+    TextBox *damping_coef = new TextBox(panel);
+    damping_coef->setFixedWidth(75);
+    damping_coef->setValue(to_string(int(density)));
+    damping_coef->setUnits("");
+    damping_coef->setFontSize(14);
+
+    slider->setCallback([damping_coef](float value) {
+      damping_coef->setValue(std::to_string(int(value * 2000)));
+    });
+    slider->setFinalCallback([&](float value) {
+      density = (double)value * 2000;
+    });
+  }
+
+
+  new Label(window, "Damping", "sans-bold");
+
+  {
+    Widget *panel = new Widget(window);
+    panel->setLayout(
+        new BoxLayout(Orientation::Horizontal, Alignment::Middle, 0, 5));
+
+    Slider *slider = new Slider(panel);
+    slider->setValue(damping / 100);
+    slider->setFixedWidth(105);
+
+    TextBox *damping_coef = new TextBox(panel);
+    damping_coef->setFixedWidth(75);
+    damping_coef->setValue(to_string(int(damping)));
+    damping_coef->setUnits("");
+    damping_coef->setFontSize(14);
+
+    slider->setCallback([damping_coef](float value) {
+      damping_coef->setValue(std::to_string(int(value * 100)));
+    });
+    slider->setFinalCallback([&](float value) {
+      damping = (double)value * 100;
+    });
+  }
+
   new Label(window, "Parameters", "sans-bold");
 
   {
@@ -266,18 +311,6 @@ void FireworkSimulator::initGUI(Screen *screen) {
     fb->setSpinnable(true);
     fb->setCallback([this](float value) { speed = value; });
 
-    new Label(panel, "density :", "sans-bold");
-
-    fb = new FloatBox<double>(panel);
-    fb->setEditable(true);
-    fb->setFixedSize(Vector2i(100, 20));
-    fb->setFontSize(14);
-    fb->setValue(density);
-    fb->setUnits("");
-    fb->setSpinnable(true);
-    fb->setMinValue(0);
-    fb->setCallback([this](float value) { density = value; });
-
     new Label(panel, "force :", "sans-bold");
 
     fb = new FloatBox<double>(panel);
@@ -290,17 +323,40 @@ void FireworkSimulator::initGUI(Screen *screen) {
     fb->setMinValue(0);
     fb->setCallback([this](float value) { energy = value; });
 
-    new Label(panel, "damping :", "sans-bold");
+  }
 
-    fb = new FloatBox<double>(panel);
-    fb->setEditable(true);
-    fb->setFixedSize(Vector2i(100, 20));
-    fb->setFontSize(14);
-    fb->setValue(damping);
-    fb->setUnits("%");
-    fb->setSpinnable(true);
-    fb->setMinValue(0);
-    fb->setCallback([this](float value) { damping = value; });
+  // Simulation constants
+
+  new Label(window, "Simulation", "sans-bold");
+
+  {
+    Widget *panel = new Widget(window);
+    GridLayout *layout =
+        new GridLayout(Orientation::Horizontal, 2, Alignment::Middle, 5, 5);
+    layout->setColAlignment({Alignment::Maximum, Alignment::Fill});
+    layout->setSpacing(0, 10);
+    panel->setLayout(layout);
+
+    new Label(panel, "frames/s :", "sans-bold");
+
+    IntBox<int> *fsec = new IntBox<int>(panel);
+    fsec->setEditable(true);
+    fsec->setFixedSize(Vector2i(100, 20));
+    fsec->setFontSize(14);
+    fsec->setValue(frames_per_sec);
+    fsec->setSpinnable(true);
+    fsec->setCallback([this](int value) { frames_per_sec = value; });
+
+    new Label(panel, "steps/frame :", "sans-bold");
+
+    IntBox<int> *num_steps = new IntBox<int>(panel);
+    num_steps->setEditable(true);
+    num_steps->setFixedSize(Vector2i(100, 20));
+    num_steps->setFontSize(14);
+    num_steps->setValue(simulation_steps);
+    num_steps->setSpinnable(true);
+    num_steps->setMinValue(0);
+    num_steps->setCallback([this](int value) { simulation_steps = value; });
   }
 }
 
