@@ -5,8 +5,8 @@
 #include "Firework.h"
 
 Firework::Firework(Vector3D startPos, Vector3D velocity, float density, float energy, float damping,
-    float particle_size, bool blink, bool tail, bool seashell):density(density), energy(energy), damping(damping),
-    particle_size(particle_size), blink(blink), tail(tail), seashell(seashell){
+    float particle_size, bool blink, bool seashell): startVelocity(velocity), density(density),
+    energy(energy), damping(damping), particle_size(particle_size), blink(blink), seashell(seashell){
     status = FireworkStatus::IGNITING;
     igniteParticle = new FireParticle(startPos, velocity);
     std::cout<< "new fireworks here "<<std::endl;
@@ -30,7 +30,8 @@ void Firework::simulate(double frames_per_sec, double simulation_steps, vector<V
             igniteParticle->position += ac * pow(delta_t, 2);
             igniteParticle->velocity += ac * delta_t;
         }
-        if (igniteParticle->velocity.y < EPS_F) {
+        if ((seashell and igniteParticle->velocity.y < startVelocity.y * .8) or
+        (igniteParticle->velocity.y < EPS_F)) {
             status = EXPLODING;
             igniteParticle->position = lastPos;
             igniteParticle->velocity = lastVec;
@@ -41,6 +42,7 @@ void Firework::simulate(double frames_per_sec, double simulation_steps, vector<V
     }
 
     if(status == EXPLODING) {
+
         for (FireParticle& p: particles) {
             p.lifetime -= delta_t;
             if(p.lifetime < EPS_F){
@@ -48,7 +50,7 @@ void Firework::simulate(double frames_per_sec, double simulation_steps, vector<V
                 continue;
             }
             p.position += p.velocity * delta_t;
-            //add damping here  in or out ???
+            //add damping here in or out ???
             Vector3D dampAc = -(p.velocity).unit() * (p.velocity).norm2() * damping;
             p.velocity += dampAc * delta_t;
             p.position += dampAc * pow(delta_t, 2);
@@ -82,5 +84,8 @@ void Firework::initExplosion(){
         p.mass = 1.0 + random_uniform();   // change
         p.velocity += v_dir * energy / p.mass;
         p.lifetime = 0.8 + 0.3 * random_uniform();  //change
+        // sea shell shape
+        if (seashell)
+            p.velocity += 2 * startVelocity;
     }
 }

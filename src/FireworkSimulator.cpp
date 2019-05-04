@@ -518,9 +518,17 @@ bool FireworkSimulator::mouseButtonCallbackEvent(int button, int action,
               Vector3D isect_pos = ray.o + ray.d * isect->t;
 //                            cout << isect_pos << endl;
               Firework *f = new Firework(isect_pos, Vector3D(0, speed, 0), density,
-                  energy, damping, particle_size, enable_blink, enable_tail, enable_seashell);
+                  energy, damping, particle_size, enable_blink, enable_seashell);
               f->color = this->color;
               fireworks.push_back(f);
+              // if trail enabled, generate a firework following the original one
+              if (enable_tail) {
+                Firework *f = new Firework(isect_pos - Vector3D(0, 1, 0), Vector3D(0, speed, 0), density,
+                    energy, damping, particle_size, enable_blink, enable_seashell);
+                f->color = this->color;
+                fireworks.push_back(f);
+              }
+
               drawContents();
             }
           }
