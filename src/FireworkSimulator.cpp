@@ -46,11 +46,6 @@ void FireworkSimulator::load_shaders() {
 
   shaders.push_back(user_shader);
 
-
-  vector<string> type_names = {"Simple", "Blinking", "Drawing"};
-  for (vector<string>::const_iterator iter = type_names.cbegin(); iter != type_names.cend(); iter++)
-    types_combobox_names.push_back(*iter);
-
 }
 
 FireworkSimulator::FireworkSimulator(std::string project_root, Screen *screen) : m_project_root(project_root) {
@@ -231,11 +226,26 @@ void FireworkSimulator::initGUI(Screen *screen) {
   new Label(window, "Type", "sans-bold");
 
   {
-    ComboBox *cb = new ComboBox(window, types_combobox_names);
-    cb->setFontSize(14);
-    cb->setCallback(
-        [this, screen](int idx) { active_type_idx = idx; });
-    cb->setSelectedIndex(active_type_idx);
+    Button *b = new Button(window, "Blinking");
+    b->setFlags(Button::ToggleButton);
+    b->setPushed(enable_blink);
+    b->setFontSize(14);
+    b->setChangeCallback(
+        [this](bool state) { enable_blink = state; });
+
+    b = new Button(window, "Tail");
+    b->setFlags(Button::ToggleButton);
+    b->setPushed(enable_tail);
+    b->setFontSize(14);
+    b->setChangeCallback(
+        [this](bool state) { enable_tail = state; });
+
+    b = new Button(window, "Seashell shaped");
+    b->setFlags(Button::ToggleButton);
+    b->setPushed(enable_seashell);
+    b->setFontSize(14);
+    b->setChangeCallback(
+        [this](bool state) { enable_seashell = state; });
   }
 
   // Parameters
@@ -499,7 +509,8 @@ bool FireworkSimulator::mouseButtonCallbackEvent(int button, int action,
             if (plane->intersect(ray, isect)) {
               Vector3D isect_pos = ray.o + ray.d * isect->t;
 //                            cout << isect_pos << endl;
-              Firework *f = new Firework(isect_pos, Vector3D(0, speed, 0), density, energy, damping, particle_size);
+              Firework *f = new Firework(isect_pos, Vector3D(0, speed, 0), density,
+                  energy, damping, particle_size, enable_blink, enable_tail, enable_seashell);
               f->color = this->color;
               fireworks.push_back(f);
               drawContents();

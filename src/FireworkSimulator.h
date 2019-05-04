@@ -65,6 +65,10 @@ private:
     float energy = 3;
     float damping = 1;
     float particle_size = 10;
+    bool enable_blink = false;
+    bool enable_tail = false;
+    bool enable_seashell = false;
+
 
     vector<CollisionObject *> *collision_objects;
 
