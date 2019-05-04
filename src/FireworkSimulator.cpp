@@ -248,13 +248,14 @@ void FireworkSimulator::initGUI(Screen *screen) {
     b->setChangeCallback(
         [this](bool state) { enable_tail = state; });
 
-    b = new Button(window, "Seashell shaped");
-    b->setFlags(Button::ToggleButton);
-    b->setPushed(enable_seashell);
-    b->setFontSize(14);
-    b->setChangeCallback(
-        [this](bool state) { enable_seashell = state; });
+    vector<string> shape_combobox_options{"Dispersed", "Sphere", "Seashell"};
+    ComboBox *cb = new ComboBox(window, shape_combobox_options);
+    cb->setFontSize(14);
+    cb->setCallback(
+            [this, screen](int idx) { shape = FireworkShape(idx); });
+    cb->setSelectedIndex(shape);
   }
+
 
   // Parameters
 
@@ -518,13 +519,13 @@ bool FireworkSimulator::mouseButtonCallbackEvent(int button, int action,
               Vector3D isect_pos = ray.o + ray.d * isect->t;
 //                            cout << isect_pos << endl;
               Firework *f = new Firework(isect_pos, Vector3D(0, speed, 0), density,
-                  energy, damping, particle_size, enable_blink, enable_seashell);
+                  energy, damping, particle_size, enable_blink, shape);
               f->color = this->color;
               fireworks.push_back(f);
               // if trail enabled, generate a firework following the original one
               if (enable_tail) {
                 Firework *f = new Firework(isect_pos - Vector3D(0, 1, 0), Vector3D(0, speed, 0), density,
-                    energy, damping, particle_size, enable_blink, enable_seashell);
+                    energy, damping, particle_size, enable_blink, shape);
                 f->color = this->color;
                 fireworks.push_back(f);
               }

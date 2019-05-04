@@ -5,8 +5,8 @@
 #include "Firework.h"
 
 Firework::Firework(Vector3D startPos, Vector3D velocity, float density, float energy, float damping,
-    float particle_size, bool blink, bool seashell): startVelocity(velocity), density(density),
-    energy(energy), damping(damping), particle_size(particle_size), blink(blink), seashell(seashell){
+    float particle_size, bool blink, FireworkShape shape): startVelocity(velocity), density(density),
+    energy(energy), damping(damping), particle_size(particle_size), blink(blink), shape(shape){
     status = FireworkStatus::IGNITING;
     igniteParticle = new FireParticle(startPos, velocity);
     std::cout<< "new fireworks here "<<std::endl;
@@ -30,7 +30,7 @@ void Firework::simulate(double frames_per_sec, double simulation_steps, vector<V
             igniteParticle->position += ac * pow(delta_t, 2);
             igniteParticle->velocity += ac * delta_t;
         }
-        if ((seashell and igniteParticle->velocity.y < startVelocity.y * .8) or
+        if ((shape==SEASHELL and igniteParticle->velocity.y < startVelocity.y * .8) or
         (igniteParticle->velocity.y < EPS_F)) {
             status = EXPLODING;
             igniteParticle->position = lastPos;
@@ -81,11 +81,11 @@ void Firework::initExplosion(){
         p.position = igniteParticle->position;
         p.velocity = igniteParticle->velocity;
         Vector3D v_dir = random_uni_velocity();
-        p.mass = 1.0 + random_uniform();   // change
+        p.mass = shape == SPHERICAL ? 1.0 : 1.0 + random_uniform();   // change
         p.velocity += v_dir * energy / p.mass;
         p.lifetime = 0.8 + 0.3 * random_uniform();  //change
         // sea shell shape
-        if (seashell)
+        if (shape == SEASHELL)
             p.velocity += 2 * startVelocity;
     }
 }

@@ -67,7 +67,7 @@ private:
     float particle_size = 10;
     bool enable_blink = false;
     bool enable_tail = false;
-    bool enable_seashell = false;
+    FireworkShape shape = FireworkShape::DISPERSED;
 
 
     vector<CollisionObject *> *collision_objects;
