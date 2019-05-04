@@ -295,10 +295,10 @@ void FireworkSimulator::initGUI(Screen *screen) {
     damping_coef->setFontSize(14);
 
     slider->setCallback([damping_coef](float value) {
-      damping_coef->setValue(std::to_string(int(value * 100)));
+      damping_coef->setValue(std::to_string(int(value * 10)));
     });
     slider->setFinalCallback([&](float value) {
-      damping = (double)value * 100;
+      damping = (double)value * 10;
     });
   }
 
