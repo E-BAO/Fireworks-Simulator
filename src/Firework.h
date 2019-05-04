@@ -38,15 +38,15 @@ public:
     nanogui::Color subColor;
     float particle_size;
 
-private:
-    float density;
-    float energy;
-    float damping;
-
     // types
     bool blink;
     bool tail;
     bool seashell;
+
+private:
+    float density;
+    float energy;
+    float damping;
 };
 
 
