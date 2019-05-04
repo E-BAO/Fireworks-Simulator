@@ -157,7 +157,6 @@ void FireworkSimulator::drawContents() {
   shader.setUniform("u_model", model);
   shader.setUniform("u_view_projection", viewProjection);
 
-  shader.setUniform("u_color", color, false);
   drawWireframe(shader);
 
   for (CollisionObject *co : *collision_objects) {
@@ -168,45 +167,54 @@ void FireworkSimulator::drawContents() {
 void FireworkSimulator::drawWireframe(GLShader &shader) {
 
   int num_particles = 0;
+
+  MatrixXf positions;
+  MatrixXf colors;
+  MatrixXf particle_sizes;
+
   for (auto f: fireworks) {
     if (f->status == DIED)
-      continue;
-    if (f->status == EXPLODING)
-      num_particles += f->particles.size();
-    else if (f->status == IGNITING)
-      num_particles++;
-  }
+        continue;
 
-  MatrixXf positions(4, num_particles);
-  MatrixXf colors(4, num_particles);
-  MatrixXf particle_sizes(1, num_particles);
-
-  int si = 0;
-  for (auto f: fireworks) {
-    if (f->status == DIED)
-      continue;
-    nanogui::Color color = f->color;
     if (f->status == EXPLODING) {
-      for (FireParticle &p: f->particles) {
-        Vector3D pos = p.position;
-        positions.col(si) << pos.x, pos.y, pos.z, 1.0;
-        colors.col(si) << color.r(), color.g(), color.b(), p.lifetime;
-        particle_sizes.col(si) << f->particle_size;
-        si++;
-      }
+
+        num_particles = f->particles.size();
+
+        positions.resize(4, num_particles);
+        colors.resize(4, num_particles);
+        particle_sizes.resize(1, num_particles);
+
+        for (int i = 0; i < num_particles; i ++) {
+            FireParticle &p = f->particles[i];
+            Vector3D pos = p.position;
+            positions.col(i) << pos.x, pos.y, pos.z, 1.0;
+            particle_sizes.col(i) << f->particle_size * p.lifetime;
+        }
+        shader.setUniform("u_color", f->color, false);
+
+        shader.uploadAttrib("in_position", positions, false);
+        shader.uploadAttrib("in_particle_size", particle_sizes, false);
+        shader.drawArray(GL_POINTS, 0, num_particles);
     } else if (f->status == IGNITING) {
-      Vector3D pos = f->igniteParticle->position;
-      positions.col(si) << pos.x, pos.y, pos.z, 1.0;
-      colors.col(si) << color.r(), color.g(), color.b(), f->igniteParticle->lifetime;
-      particle_sizes.col(si) << f->particle_size;
-      si++;
+        num_particles = 1;
+
+        positions.resize(4, 1);
+        colors.resize(4, 1);
+        particle_sizes.resize(1, 1);
+
+
+        Vector3D pos = f->igniteParticle->position;
+        positions.col(0) << pos.x, pos.y, pos.z, 1.0;
+        particle_sizes.col(0) << f->particle_size;
+
+        shader.setUniform("u_color", f->color, false);
+
+        shader.uploadAttrib("in_position", positions, false);
+        shader.uploadAttrib("in_particle_size", particle_sizes, false);
+        shader.drawArray(GL_POINTS, 0, 1);
     }
   }
-  shader.uploadAttrib("in_position", positions, false);
-  shader.uploadAttrib("in_color", colors, false);
-  shader.uploadAttrib("in_particle_size", particle_sizes, false);
 
-  shader.drawArray(GL_POINTS, 0, num_particles);
 }
 
 void FireworkSimulator::initGUI(Screen *screen) {
