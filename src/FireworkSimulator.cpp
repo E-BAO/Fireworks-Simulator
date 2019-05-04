@@ -179,6 +179,7 @@ void FireworkSimulator::drawWireframe(GLShader &shader) {
 
   MatrixXf positions(4, num_particles);
   MatrixXf colors(4, num_particles);
+  MatrixXf particle_sizes(1, num_particles);
 
   int si = 0;
   for (auto f: fireworks) {
@@ -190,17 +191,20 @@ void FireworkSimulator::drawWireframe(GLShader &shader) {
         Vector3D pos = p.position;
         positions.col(si) << pos.x, pos.y, pos.z, 1.0;
         colors.col(si) << color.r(), color.g(), color.b(), p.lifetime;
+        particle_sizes.col(si) << f->particle_size;
         si++;
       }
     } else if (f->status == IGNITING) {
       Vector3D pos = f->igniteParticle->position;
       positions.col(si) << pos.x, pos.y, pos.z, 1.0;
       colors.col(si) << color.r(), color.g(), color.b(), f->igniteParticle->lifetime;
+      particle_sizes.col(si) << f->particle_size;
       si++;
     }
   }
   shader.uploadAttrib("in_position", positions, false);
   shader.uploadAttrib("in_color", colors, false);
+  shader.uploadAttrib("in_particle_size", particle_sizes, false);
 
   shader.drawArray(GL_POINTS, 0, num_particles);
 }
@@ -322,6 +326,18 @@ void FireworkSimulator::initGUI(Screen *screen) {
     fb->setSpinnable(true);
     fb->setMinValue(0);
     fb->setCallback([this](float value) { energy = value; });
+
+    new Label(panel, "particle size :", "sans-bold");
+
+    fb = new FloatBox<double>(panel);
+    fb->setEditable(true);
+    fb->setFixedSize(Vector2i(100, 20));
+    fb->setFontSize(14);
+    fb->setValue(particle_size);
+    fb->setUnits("px");
+    fb->setSpinnable(true);
+    fb->setMinValue(0);
+    fb->setCallback([this](float value) { particle_size = value; });
 
   }
 
@@ -475,7 +491,7 @@ bool FireworkSimulator::mouseButtonCallbackEvent(int button, int action,
             if (plane->intersect(ray, isect)) {
               Vector3D isect_pos = ray.o + ray.d * isect->t;
 //                            cout << isect_pos << endl;
-              Firework *f = new Firework(isect_pos, Vector3D(0, speed, 0), density, energy, damping);
+              Firework *f = new Firework(isect_pos, Vector3D(0, speed, 0), density, energy, damping, particle_size);
               f->color = this->color;
               fireworks.push_back(f);
               drawContents();

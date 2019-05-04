@@ -23,7 +23,7 @@ enum FireworkStatus { IGNITING = 0, EXPLODING = 1, DIED = 2 };
 
 class Firework {
 public:
-    Firework(Vector3D startPos = Vector3D(0,0,0), Vector3D velocity = Vector3D(0,0,0), float density = 10.0, float energy = 3.0, float damping = 1.0);
+    Firework(Vector3D startPos = Vector3D(0,0,0), Vector3D velocity = Vector3D(0,0,0), float density = 10.0, float energy = 3.0, float damping = 1.0, float particle_size = 10.0);
     ~Firework();
     void simulate(double frames_per_sec, double simulation_steps, vector<Vector3D> external_accelerations);
     void initExplosion();
@@ -32,6 +32,7 @@ public:
     vector<FireParticle> particles;
     FireParticle* igniteParticle;
     nanogui::Color color;
+    float particle_size;
 
 private:
     float density;

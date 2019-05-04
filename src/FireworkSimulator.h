@@ -64,6 +64,7 @@ private:
     float density = 15;
     float energy = 3;
     float damping = 1;
+    float particle_size = 10;
 
     vector<CollisionObject *> *collision_objects;
 

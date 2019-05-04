@@ -4,7 +4,7 @@
 
 #include "Firework.h"
 
-Firework::Firework(Vector3D startPos, Vector3D velocity, float density, float energy, float damping):density(density), energy(energy), damping(damping){
+Firework::Firework(Vector3D startPos, Vector3D velocity, float density, float energy, float damping, float particle_size):density(density), energy(energy), damping(damping), particle_size(particle_size){
     status = FireworkStatus::IGNITING;
     igniteParticle = new FireParticle(startPos, velocity);
     std::cout<< "new fireworks here "<<std::endl;
