@@ -6,6 +6,7 @@ uniform vec4 u_color;
 
 in vec4 in_position;
 in float in_particle_size;
+in float in_blink;
 
 out vec4 v_color;
 
@@ -14,5 +15,5 @@ void main() {
 
     gl_PointSize = in_particle_size;// / gl_Position.z;
 
-    v_color = u_color;
+    v_color = u_color * vec4(1, 1, 1, in_blink);
 }
