@@ -297,7 +297,7 @@ void FireworkSimulator::initGUI(Screen *screen) {
     b->setChangeCallback(
         [this](bool state) { enable_trail = state; });
 
-    vector<string> shape_combobox_options{"Dispersed", "Sphere", "Seashell"};
+    vector<string> shape_combobox_options{"Dispersed", "Sphere", "Sparkler"};
     ComboBox *cb = new ComboBox(window, shape_combobox_options);
     cb->setFontSize(14);
     cb->setCallback(

@@ -14,7 +14,7 @@ Firework::Firework(Vector3D startPos, Vector3D velocity, float density, float en
   status = FireworkStatus::IGNITING;
   igniteParticle = new FireParticle(startPos, velocity);
   trailLen *= particle_size;
-  if (shape == SEASHELL)
+  if (shape == SPARKLER)
     startVelocity /= 2;
   std::cout << "new fireworks here " << std::endl;
 }
@@ -27,6 +27,11 @@ void Firework::simulate(double frames_per_sec, double simulation_steps, vector<V
 
   double delta_t = 1.0f / frames_per_sec / simulation_steps;
 
+  int initStep = (frames_per_sec * simulation_steps / 20);
+  if(shape == SPARKLER and totalSteps%initStep == 0 and totalSteps < initStep * 10) {
+    initExplosion(false);
+  }
+
   if (status == DIED)
     return;
   if (status == IGNITING) {
@@ -38,15 +43,12 @@ void Firework::simulate(double frames_per_sec, double simulation_steps, vector<V
       igniteParticle->velocity += ac * delta_t;
     }
     if (igniteParticle->velocity.y < EPS_F or
-        (shape == SEASHELL and igniteParticle->velocity.y < startVelocity.y * .8)) {
+        (shape == SPARKLER and igniteParticle->velocity.y < startVelocity.y * .8)) {
       status = EXPLODING;
       igniteParticle->position = lastPos;
       igniteParticle->velocity = lastVec;
       particles.resize((int) density);
-      if (trail)
-        subParticles.resize((int) density * subNum);
       initExplosion();  //fireworks shape here
-      delete (igniteParticle);
     }
   }
 
@@ -68,11 +70,15 @@ void Firework::simulate(double frames_per_sec, double simulation_steps, vector<V
       collisionStep += 1;
     }
 
+    int numDied = 0;
     for (FireParticle &p: particles) {
       p.lifetime -= delta_t;
       if (p.lifetime < EPS_F) {
-        status = DIED;
-        continue;
+        numDied++;
+        if (numDied > 0.8 * particles.size()) {
+            status = DIED;
+            continue;
+        }
       }
       p.position += p.velocity * delta_t;
       //add damping here in or out ???
@@ -85,6 +91,7 @@ void Firework::simulate(double frames_per_sec, double simulation_steps, vector<V
         p.position += ac * pow(delta_t, 2);
       }
     }
+    totalSteps++;
   }
 }
 
@@ -100,31 +107,48 @@ Vector3D random_uni_velocity() {
   return v.unit();
 }
 
-void Firework::initExplosion() {
+void Firework::initParticle(FireParticle *p){
+  p->position = igniteParticle->position;
+  p->velocity = igniteParticle->velocity;
+  Vector3D v_dir = random_uni_velocity();
+  p->mass = shape == SPHERICAL ? 0.5 : 1.0 + random_uniform();
+  p->velocity += v_dir * energy / p->mass;
+  p->lifetime = 0.8 + 0.3 * random_uniform();  //change
+  // sparkler shape
+  if (shape == SPARKLER)
+    p->velocity += 2 * startVelocity;
+}
+
+void Firework::initExplosion(bool first) {
   srand(time(nullptr));
-  for (FireParticle &p: particles) {
-    p.position = igniteParticle->position;
-    p.velocity = igniteParticle->velocity;
-    Vector3D v_dir = random_uni_velocity();
-    p.mass = shape == SPHERICAL ? 0.5 : 1.0 + random_uniform();   // change
-    p.velocity += v_dir * energy / p.mass;
-    p.lifetime = 0.8 + 0.3 * random_uniform();  //change
-    // trail
-    if (trail) {
-      int particleNum = particles.size();
-      for (size_t i = 0; i < particleNum; ++i) {
-        FireParticle &p = particles[i];
-        for (size_t j = 0; j < subNum; ++j) {
-          FireParticle &subP = subParticles[j * particleNum + i];
-          subP.position = p.position;
-          subP.velocity = p.velocity;
-          subP.mass = p.mass;
-          subP.lifetime = p.lifetime;
-        }
+  int startIdx = 0;
+  if (first) {
+    for (FireParticle &p: particles) {
+      initParticle(&p);
+    }
+  }
+  else {
+    startIdx = particles.size();
+    for (int i = 0; i < density; i++) {
+      FireParticle p = FireParticle();
+      initParticle(&p);
+      particles.push_back(p);
+    }
+  }
+  // trail
+  if (trail) {
+    int particleNum = particles.size();
+    subParticles.resize((int) particleNum * subNum);
+
+    for (size_t i = startIdx; i < particleNum; ++i) {
+      FireParticle &p = particles[i];
+      for (size_t j = 0; j < subNum; ++j) {
+        FireParticle &subP = subParticles[j * particleNum + i];
+        subP.position = p.position;
+        subP.velocity = p.velocity;
+        subP.mass = p.mass;
+        subP.lifetime = p.lifetime;
       }
     }
-    // seashell shape
-    if (shape == SEASHELL)
-      p.velocity += 2 * startVelocity;
   }
 }
