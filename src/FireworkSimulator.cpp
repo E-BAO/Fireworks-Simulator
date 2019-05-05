@@ -131,7 +131,7 @@ void FireworkSimulator::init() {
 
 
 void FireworkSimulator::drawContents() {
-  glEnable(GL_DEPTH_TEST);
+    glEnable(GL_DEPTH_TEST);
 
     const UserShader &plane_shader = shaders[1];
 
@@ -156,7 +156,9 @@ void FireworkSimulator::drawContents() {
         co->render(shader0);
     }
 
-  if (!is_paused) {
+    glDisable(GL_DEPTH_TEST);
+
+    if (!is_paused) {
     vector<Vector3D> external_accelerations = {gravity};
 
     for (Firework *f: fireworks) {
