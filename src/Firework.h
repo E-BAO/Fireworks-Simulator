@@ -49,6 +49,8 @@ private:
     float energy;
     float damping;
     Vector3D  startVelocity;
+    int collisionStep = 0;
+    int trailLen = 10;
 };
 
 

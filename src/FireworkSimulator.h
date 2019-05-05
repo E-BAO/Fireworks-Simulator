@@ -60,11 +60,11 @@ private:
 
     CGL::Vector3D gravity = CGL::Vector3D(0, -9.8, 0);
     nanogui::Color color = nanogui::Color(1.0f, 1.0f, 1.0f, 1.0f);
-    float speed = 5;
-    float density = 200;
+    float speed = 3;
+    float density = 2;
     float energy = 3;
     float damping = 1;
-    float particle_size = 10;
+    float particle_size = 100;
     bool enable_blink = false;
     bool enable_trail = false;
     float trail_damping = .9;
