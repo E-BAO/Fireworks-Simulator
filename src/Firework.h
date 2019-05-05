@@ -26,7 +26,7 @@ class Firework {
 public:
     Firework(Vector3D startPos = Vector3D(0,0,0), Vector3D velocity = Vector3D(0,0,0), float density = 10.0,
         float energy = 3.0, float damping = 1.0, float particle_size = 10.0, bool blink = false,
-        FireworkShape shape = DISPERSED);
+        bool trail = false, FireworkShape shape = DISPERSED);
     ~Firework();
     void simulate(double frames_per_sec, double simulation_steps, vector<Vector3D> external_accelerations);
     void initExplosion();
@@ -36,12 +36,13 @@ public:
     vector<FireParticle> subParticles;
     FireParticle* igniteParticle;
     nanogui::Color color;
-    nanogui::Color subColor;
     float particle_size;
 
     // types
     bool blink;
+    bool trail;
     FireworkShape shape;
+  int subNum = 10;
 
 private:
     float density;

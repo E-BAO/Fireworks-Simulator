@@ -170,51 +170,74 @@ void FireworkSimulator::drawWireframe(GLShader &shader) {
 
   for (auto f: fireworks) {
     if (f->status == DIED)
-        continue;
+      continue;
 
     if (f->status == EXPLODING) {
 
-        num_particles = f->particles.size();
+      num_particles = f->particles.size();
 
-        positions.resize(4, num_particles);
-        colors.resize(4, num_particles);
-        particle_sizes.resize(1, num_particles);
-        blink_states.resize(1, num_particles);
+      positions.resize(4, num_particles);
+      colors.resize(4, num_particles);
+      particle_sizes.resize(1, num_particles);
+      blink_states.resize(1, num_particles);
 
-        for (int i = 0; i < num_particles; i ++) {
-            FireParticle &p = f->particles[i];
+      for (int i = 0; i < num_particles; i++) {
+        FireParticle &p = f->particles[i];
+        Vector3D pos = p.position;
+        positions.col(i) << pos.x, pos.y, pos.z, 1.0;
+        particle_sizes.col(i) << f->particle_size * p.lifetime;
+        int blinkval = f->blink ? rand() % 2 : 1;
+        blink_states.col(i) << blinkval;
+      }
+      shader.setUniform("u_color", f->color, false);
+
+      shader.uploadAttrib("in_position", positions, false);
+      shader.uploadAttrib("in_particle_size", particle_sizes, false);
+      shader.uploadAttrib("in_blink", blink_states, false);
+      shader.drawArray(GL_POINTS, 0, num_particles);
+
+      if (f->trail) {
+        int num_trail = f->subNum;
+        for (int j = 0; j < num_trail; ++j) {
+          for (int i = 0; i < num_particles; i++) {
+            FireParticle &p = f->subParticles[j * num_particles + i];
             Vector3D pos = p.position;
             positions.col(i) << pos.x, pos.y, pos.z, 1.0;
-            particle_sizes.col(i) << f->particle_size * p.lifetime;
-            int blinkval = f->blink ? rand()%2 : 1;
+            particle_sizes.col(i) << f->particle_size * pow(trail_damping, j + 1) * p.lifetime;
+            int blinkval = f->blink ? rand() % 2 : 1;
             blink_states.col(i) << blinkval;
+          }
+          nanogui::Color damping_color = f->color;
+          damping_color.w() *= pow(trail_damping, j + 1);
+          shader.setUniform("u_color", damping_color, false);
+
+          shader.uploadAttrib("in_position", positions, false);
+          shader.uploadAttrib("in_particle_size", particle_sizes, false);
+          shader.uploadAttrib("in_blink", blink_states, false);
+          shader.drawArray(GL_POINTS, 0, num_particles);
         }
-        shader.setUniform("u_color", f->color, false);
+      }
 
-        shader.uploadAttrib("in_position", positions, false);
-        shader.uploadAttrib("in_particle_size", particle_sizes, false);
-        shader.uploadAttrib("in_blink", blink_states, false);
-        shader.drawArray(GL_POINTS, 0, num_particles);
     } else if (f->status == IGNITING) {
-        num_particles = 1;
+      num_particles = 1;
 
-        positions.resize(4, 1);
-        colors.resize(4, 1);
-        particle_sizes.resize(1, 1);
-        blink_states.resize(1, 1);
+      positions.resize(4, 1);
+      colors.resize(4, 1);
+      particle_sizes.resize(1, 1);
+      blink_states.resize(1, 1);
 
 
-        Vector3D pos = f->igniteParticle->position;
-        positions.col(0) << pos.x, pos.y, pos.z, 1.0;
-        particle_sizes.col(0) << f->particle_size;
-        blink_states.col(0) << 1;
+      Vector3D pos = f->igniteParticle->position;
+      positions.col(0) << pos.x, pos.y, pos.z, 1.0;
+      particle_sizes.col(0) << f->particle_size;
+      blink_states.col(0) << 1;
 
-        shader.setUniform("u_color", f->color, false);
+      shader.setUniform("u_color", f->color, false);
 
-        shader.uploadAttrib("in_position", positions, false);
-        shader.uploadAttrib("in_particle_size", particle_sizes, false);
-        shader.uploadAttrib("in_blink", blink_states, false);
-        shader.drawArray(GL_POINTS, 0, 1);
+      shader.uploadAttrib("in_position", positions, false);
+      shader.uploadAttrib("in_particle_size", particle_sizes, false);
+      shader.uploadAttrib("in_blink", blink_states, false);
+      shader.drawArray(GL_POINTS, 0, 1);
     }
   }
 
@@ -241,18 +264,18 @@ void FireworkSimulator::initGUI(Screen *screen) {
     b->setChangeCallback(
         [this](bool state) { enable_blink = state; });
 
-    b = new Button(window, "Tail");
+    b = new Button(window, "Trail");
     b->setFlags(Button::ToggleButton);
-    b->setPushed(enable_tail);
+    b->setPushed(enable_trail);
     b->setFontSize(14);
     b->setChangeCallback(
-        [this](bool state) { enable_tail = state; });
+        [this](bool state) { enable_trail = state; });
 
     vector<string> shape_combobox_options{"Dispersed", "Sphere", "Seashell"};
     ComboBox *cb = new ComboBox(window, shape_combobox_options);
     cb->setFontSize(14);
     cb->setCallback(
-            [this, screen](int idx) { shape = FireworkShape(idx); });
+        [this, screen](int idx) { shape = FireworkShape(idx); });
     cb->setSelectedIndex(shape);
   }
 
@@ -282,6 +305,7 @@ void FireworkSimulator::initGUI(Screen *screen) {
     slider->setFixedWidth(105);
 
     TextBox *damping_coef = new TextBox(panel);
+//    damping_coef->setEditable(true);
     damping_coef->setFixedWidth(75);
     damping_coef->setValue(to_string(int(density)));
     damping_coef->setUnits("");
@@ -291,7 +315,7 @@ void FireworkSimulator::initGUI(Screen *screen) {
       damping_coef->setValue(std::to_string(int(value * 2000)));
     });
     slider->setFinalCallback([&](float value) {
-      density = (double)value * 2000;
+      density = (double) value * 2000;
     });
   }
 
@@ -308,6 +332,7 @@ void FireworkSimulator::initGUI(Screen *screen) {
     slider->setFixedWidth(105);
 
     TextBox *damping_coef = new TextBox(panel);
+//    damping_coef->setEditable(true);
     damping_coef->setFixedWidth(75);
     damping_coef->setValue(to_string(int(damping)));
     damping_coef->setUnits("");
@@ -317,7 +342,7 @@ void FireworkSimulator::initGUI(Screen *screen) {
       damping_coef->setValue(std::to_string(int(value * 10)));
     });
     slider->setFinalCallback([&](float value) {
-      damping = (double)value * 10;
+      damping = (double) value * 10;
     });
   }
 
@@ -519,16 +544,9 @@ bool FireworkSimulator::mouseButtonCallbackEvent(int button, int action,
               Vector3D isect_pos = ray.o + ray.d * isect->t;
 //                            cout << isect_pos << endl;
               Firework *f = new Firework(isect_pos, Vector3D(0, speed, 0), density,
-                  energy, damping, particle_size, enable_blink, shape);
+                                         energy, damping, particle_size, enable_blink, enable_trail, shape);
               f->color = this->color;
               fireworks.push_back(f);
-              // if trail enabled, generate a firework following the original one
-              if (enable_tail) {
-                Firework *f = new Firework(isect_pos - Vector3D(0, 1, 0), Vector3D(0, speed, 0), density,
-                    energy, damping, particle_size, enable_blink, shape);
-                f->color = this->color;
-                fireworks.push_back(f);
-              }
 
               drawContents();
             }
