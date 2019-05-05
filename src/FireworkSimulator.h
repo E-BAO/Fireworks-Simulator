@@ -15,7 +15,7 @@ using namespace nanogui;
 
 struct UserShader;
 
-enum ShaderTypeHint { SIMPLE = 0, NORMALS = 1, PHONG = 2 };
+enum ShaderTypeHint { SIMPLE = 0, NORMALS = 1, PHONG = 2, PLANE = 3 };
 
 class FireworkSimulator {
 public:

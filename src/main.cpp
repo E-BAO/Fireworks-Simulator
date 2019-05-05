@@ -30,12 +30,6 @@ using namespace nanogui;
 
 #define msg(s) cerr << "[ClothSim] " << s << endl;
 
-const string SPHERE = "sphere";
-const string PLANE = "plane";
-const string CLOTH = "cloth";
-
-const unordered_set<string> VALID_KEYS = {SPHERE, PLANE, CLOTH};
-
 FireworkSimulator *app = nullptr;
 GLFWwindow *window = nullptr;
 Screen *screen = nullptr;
@@ -496,7 +490,9 @@ int main(int argc, char **argv) {
     glClearColor(0.25f, 0.25f, 0.25f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glDisable(GL_CULL_FACE);
-    glEnable(GL_BLEND);
+//      glEnable(GL_POINT_SMOOTH);
+
+      glEnable(GL_BLEND);
 
       glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 

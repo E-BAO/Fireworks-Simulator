@@ -46,6 +46,17 @@ void FireworkSimulator::load_shaders() {
 
   shaders.push_back(user_shader);
 
+    shader_name = "Plane";
+    shader_fname = "Plane.frag";
+    vert_shader = m_project_root + "/shaders/Plane.vert";
+    GLShader plane_nanugui_shader;
+    plane_nanugui_shader.initFromFiles(shader_name, vert_shader,
+                                       m_project_root + "/shaders/" + shader_fname);
+    hint = ShaderTypeHint::PLANE;
+    UserShader plane_shader(shader_name, plane_nanugui_shader, hint);
+
+    shaders.push_back(plane_shader);
+
 }
 
 FireworkSimulator::FireworkSimulator(std::string project_root, Screen *screen) : m_project_root(project_root) {
@@ -122,6 +133,29 @@ void FireworkSimulator::init() {
 void FireworkSimulator::drawContents() {
   glEnable(GL_DEPTH_TEST);
 
+    const UserShader &plane_shader = shaders[1];
+
+
+    GLShader shader0 = plane_shader.nanogui_shader;
+    shader0.bind();
+
+    // Prepare the camera projection matrix
+
+    Matrix4f model;
+    model.setIdentity();
+
+    Matrix4f view = getViewMatrix();
+    Matrix4f projection = getProjectionMatrix();
+
+    Matrix4f viewProjection = projection * view;
+
+    shader0.setUniform("u_model", model);
+    shader0.setUniform("u_view_projection", viewProjection);
+
+    for (CollisionObject *co : *collision_objects) {
+        co->render(shader0);
+    }
+
   if (!is_paused) {
     vector<Vector3D> external_accelerations = {gravity};
 
@@ -138,16 +172,6 @@ void FireworkSimulator::drawContents() {
 
   GLShader shader = active_shader.nanogui_shader;
   shader.bind();
-
-  // Prepare the camera projection matrix
-
-  Matrix4f model;
-  model.setIdentity();
-
-  Matrix4f view = getViewMatrix();
-  Matrix4f projection = getProjectionMatrix();
-
-  Matrix4f viewProjection = projection * view;
 
   shader.setUniform("u_model", model);
   shader.setUniform("u_view_projection", viewProjection);
