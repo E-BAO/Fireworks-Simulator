@@ -13,6 +13,7 @@ Firework::Firework(Vector3D startPos, Vector3D velocity, float density, float en
                                                                                        shape(shape) {
   status = FireworkStatus::IGNITING;
   igniteParticle = new FireParticle(startPos, velocity);
+  trailLen *= particle_size;
   if (shape == SEASHELL)
     startVelocity /= 2;
   std::cout << "new fireworks here " << std::endl;
@@ -56,7 +57,7 @@ void Firework::simulate(double frames_per_sec, double simulation_steps, vector<V
       for (int i = subNum - 1; i >= 0; --i) {
         for (int j = 0; j < particleNum; ++j) {
           FireParticle &subP = subParticles[i * particleNum + j];
-          if (collisionStep > trailLen * (i + 1)) {
+          if (collisionStep > trailLen * i * simulation_steps) {
             subP.position += subP.velocity * delta_t;
             Vector3D dampAc = -(subP.velocity).unit() * (subP.velocity).norm2() * damping;
             subP.velocity += dampAc * delta_t;
