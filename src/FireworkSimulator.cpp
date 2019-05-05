@@ -218,8 +218,8 @@ void FireworkSimulator::drawWireframe(GLShader &shader) {
             int blinkval = f->blink ? rand() % 2 : 1;
             blink_states.col(i) << blinkval;
           }
-          nanogui::Color damping_color = f->color;
-          damping_color.w() *= pow(trail_damping, j + 1);
+          nanogui::Color damping_color(f->color.r(), f->color.g(), f->color.b(),
+              f->color.w() * pow(trail_damping, j));
           shader.setUniform("u_color", damping_color, false);
 
           shader.uploadAttrib("in_position", positions, false);
