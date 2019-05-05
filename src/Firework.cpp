@@ -75,7 +75,7 @@ void Firework::simulate(double frames_per_sec, double simulation_steps, vector<V
       p.lifetime -= delta_t;
       if (p.lifetime < EPS_F) {
         numDied++;
-        if (numDied > 0.8 * particles.size()) {
+        if (numDied > 0.2 * particles.size()) {
             status = DIED;
             continue;
         }
@@ -111,12 +111,16 @@ void Firework::initParticle(FireParticle *p){
   p->position = igniteParticle->position;
   p->velocity = igniteParticle->velocity;
   Vector3D v_dir = random_uni_velocity();
+  // sparkler shape
+  if (shape == SPARKLER) {
+    p->velocity += 2.0 * startVelocity;
+    v_dir = Vector3D(0.2 * v_dir.x, abs(v_dir.y), 0.2 * v_dir.z);
+  }
+
   p->mass = shape == SPHERICAL ? 0.5 : 1.0 + random_uniform();
   p->velocity += v_dir * energy / p->mass;
   p->lifetime = 0.8 + 0.3 * random_uniform();  //change
-  // sparkler shape
-  if (shape == SPARKLER)
-    p->velocity += 2 * startVelocity;
+
 }
 
 void Firework::initExplosion(bool first) {
