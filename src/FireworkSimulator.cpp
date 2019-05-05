@@ -207,21 +207,6 @@ void FireworkSimulator::drawWireframe(GLShader &shader) {
       particle_sizes.resize(1, num_particles);
       blink_states.resize(1, num_particles);
 
-      for (int i = 0; i < num_particles; i++) {
-        FireParticle &p = f->particles[i];
-        Vector3D pos = p.position;
-        positions.col(i) << pos.x, pos.y, pos.z, 1.0;
-        particle_sizes.col(i) << f->particle_size * p.lifetime;
-        int blinkval = f->blink ? rand() % 2 : 1;
-        blink_states.col(i) << blinkval;
-      }
-      shader.setUniform("u_color", f->color, false);
-
-      shader.uploadAttrib("in_position", positions, false);
-      shader.uploadAttrib("in_particle_size", particle_sizes, false);
-      shader.uploadAttrib("in_blink", blink_states, false);
-      shader.drawArray(GL_POINTS, 0, num_particles);
-
       if (f->trail) {
         int num_trail = f->subNum;
         for (int j = 0; j < num_trail; ++j) {
@@ -242,6 +227,21 @@ void FireworkSimulator::drawWireframe(GLShader &shader) {
           shader.uploadAttrib("in_blink", blink_states, false);
           shader.drawArray(GL_POINTS, 0, num_particles);
         }
+      } else {
+        for (int i = 0; i < num_particles; i++) {
+          FireParticle &p = f->particles[i];
+          Vector3D pos = p.position;
+          positions.col(i) << pos.x, pos.y, pos.z, 1.0;
+          particle_sizes.col(i) << f->particle_size * p.lifetime;
+          int blinkval = f->blink ? rand() % 2 : 1;
+          blink_states.col(i) << blinkval;
+        }
+        shader.setUniform("u_color", f->color, false);
+
+        shader.uploadAttrib("in_position", positions, false);
+        shader.uploadAttrib("in_particle_size", particle_sizes, false);
+        shader.uploadAttrib("in_blink", blink_states, false);
+        shader.drawArray(GL_POINTS, 0, num_particles);
       }
 
     } else if (f->status == IGNITING) {

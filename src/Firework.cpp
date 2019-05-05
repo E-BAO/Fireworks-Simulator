@@ -56,21 +56,11 @@ void Firework::simulate(double frames_per_sec, double simulation_steps, vector<V
       for (int i = subNum - 1; i >= 0; --i) {
         for (int j = 0; j < particleNum; ++j) {
           FireParticle &subP = subParticles[i * particleNum + j];
-          if (collisionStep > trailLen * i) {
+          if (collisionStep > trailLen * (i + 1)) {
             subP.position += subP.velocity * delta_t;
-            //add damping here in or out ???
             Vector3D dampAc = -(subP.velocity).unit() * (subP.velocity).norm2() * damping;
             subP.velocity += dampAc * delta_t;
             subP.position += dampAc * pow(delta_t, 2);
-//            subP.velocity = particles[j].velocity;
-//            subP.position = particles[j].position;
-//            if (i == 0) {
-//              subP.velocity = particles[j].velocity;
-//              subP.position = particles[j].position;
-//            } else {
-//              subP.velocity = subParticles[(i - 1) * particleNum + j].velocity;
-//              subP.position = subParticles[(i - 1) * particleNum + j].position;
-//            }
           }
         }
       }
