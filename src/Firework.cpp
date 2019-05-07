@@ -64,6 +64,10 @@ void Firework::simulate(double frames_per_sec, double simulation_steps, vector<V
                         Vector3D dampAc = -(subP.velocity).unit() * (subP.velocity).norm2() * damping;
                         subP.velocity += dampAc * delta_t;
                         subP.position += dampAc * pow(delta_t, 2);
+                        for (auto ac: external_accelerations) {
+                            subP.velocity += ac * delta_t;
+                            subP.position += ac * pow(delta_t, 2);
+                        }
                     }
                 }
             }
@@ -79,6 +83,7 @@ void Firework::simulate(double frames_per_sec, double simulation_steps, vector<V
                     status = DIED;
                     continue;
                 }
+                continue;
             }
             p.position += p.velocity * delta_t;
             //add damping here in or out ???
@@ -92,6 +97,18 @@ void Firework::simulate(double frames_per_sec, double simulation_steps, vector<V
             }
         }
         totalSteps++;
+
+        igniteParticle->position += igniteParticle->velocity * delta_t;
+        igniteParticle->lifetime -= delta_t;
+        //add damping here in or out ???
+        Vector3D dampAc = -(igniteParticle->velocity).unit() * (igniteParticle->velocity).norm2() * damping;
+        igniteParticle->velocity += dampAc * delta_t;
+        igniteParticle->position += dampAc * pow(delta_t, 2);
+
+        for (auto ac: external_accelerations) {
+            igniteParticle->position += ac * pow(delta_t, 2);
+            igniteParticle->velocity += ac * delta_t;
+        }
     }
 }
 
@@ -155,4 +172,7 @@ void Firework::initExplosion(bool first) {
             }
         }
     }
+
+    igniteParticle -> lifetime = 1.0;
+    igniteParticle->mass = shape == SPHERICAL ? 0.5 : 1.0;
 }
