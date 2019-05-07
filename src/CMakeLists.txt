@@ -78,6 +78,15 @@ target_link_libraries(clothsim
     ${CMAKE_THREADS_INIT}
 )
 
+add_executable(firework_simulator ${CLOTHSIM_VIEWER_SOURCE})
+
+target_link_libraries(firework_simulator
+        CGL ${CGL_LIBRARIES}
+        nanogui ${NANOGUI_EXTRA_LIBS}
+        ${FREETYPE_LIBRARIES}
+        ${CMAKE_THREADS_INIT}
+        )
+
 #-------------------------------------------------------------------------------
 # Platform-specific configurations for target
 #-------------------------------------------------------------------------------

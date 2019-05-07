@@ -20,16 +20,17 @@ using namespace std;
 using namespace nanogui;
 
 enum FireworkStatus { IGNITING = 0, EXPLODING = 1, DIED = 2 };
-enum FireworkShape { DISPERSED = 0, SPHERICAL = 1, SEASHELL = 2};
+enum FireworkShape { DISPERSED = 0, SPHERICAL = 1, SPARKLER = 2};
 
 class Firework {
 public:
     Firework(Vector3D startPos = Vector3D(0,0,0), Vector3D velocity = Vector3D(0,0,0), float density = 10.0,
-        float energy = 3.0, float damping = 1.0, float particle_size = 10.0, bool blink = false,
-        bool trail = false, FireworkShape shape = DISPERSED);
+             float energy = 3.0, float damping = 1.0, float particle_size = 10.0, bool blink = false,
+             bool trail = false, FireworkShape shape = DISPERSED);
     ~Firework();
     void simulate(double frames_per_sec, double simulation_steps, vector<Vector3D> external_accelerations);
-    void initExplosion();
+    void initExplosion(bool first = true);
+    void initParticle(FireParticle *p);
 
     FireworkStatus status;
     vector<FireParticle> particles;
@@ -42,7 +43,7 @@ public:
     bool blink;
     bool trail;
     FireworkShape shape;
-    int subNum = 10;
+    int subNum = 8;
 
 private:
     float density;
@@ -50,7 +51,8 @@ private:
     float damping;
     Vector3D  startVelocity;
     int collisionStep = 0;
-    int trailLen = 10;
+    float trailLen = 0.007;
+    int totalSteps = 0;
 };
 
 
