@@ -24,7 +24,7 @@ set(CLOTHSIM_VIEWER_SOURCE
     misc/file_utils.cpp
 
     # Camera
-    camera.cpp FireParticle.cpp ExplosionParticle.cpp ExplosionParticle.h)
+    camera.cpp FireParticle.cpp)
 
 # Windows-only sources
 if(WIN32)
@@ -69,7 +69,7 @@ link_directories(
 #-------------------------------------------------------------------------------
 # Add executable
 #-------------------------------------------------------------------------------
-add_executable(clothsim ${CLOTHSIM_VIEWER_SOURCE})
+add_executable(clothsim ${CLOTHSIM_VIEWER_SOURCE} SmokeParticle.cpp SmokeParticle.h Smoke.cpp Smoke.h)
 
 target_link_libraries(clothsim
     CGL ${CGL_LIBRARIES}

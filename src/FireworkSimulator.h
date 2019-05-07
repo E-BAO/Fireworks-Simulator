@@ -9,6 +9,7 @@
 #include "camera.h"
 #include "collision/collisionObject.h"
 #include "Firework.h"
+#include "Smoke.h"
 #include "collision/plane.h"
 
 using namespace nanogui;
@@ -52,6 +53,7 @@ private:
 
     // Default simulation values
     vector<Firework*> fireworks;
+  vector<Smoke*> smokes;
     void drawWireframe(GLShader &shader);
     vector<Light> fire_lights;
 
@@ -78,7 +80,7 @@ private:
     float particle_size = 20;
     bool enable_blink = false;
     bool enable_trail = false;
-    float trail_damping = .92;
+    float trail_damping = 0.92;
     FireworkShape shape = FireworkShape::DISPERSED;
 
 

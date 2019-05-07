@@ -214,10 +214,9 @@ void FireworkSimulator::drawWireframe(GLShader &shader) {
   MatrixXf colors;
   MatrixXf particle_sizes;
   MatrixXf blink_states;
-
   for (auto f: fireworks) {
     if (f->status == DIED){
-        continue;
+      continue;
     }
 
     if (f->status == EXPLODING) {
@@ -232,7 +231,7 @@ void FireworkSimulator::drawWireframe(GLShader &shader) {
       if (f->trail) {
         int num_trail = f->subNum;
         for (int j = 0; j < num_trail; ++j) {
-          float trail_size = ceil(pow(trail_damping, j));
+          float trail_size = pow(trail_damping, j);
           for (int i = 0; i < num_particles; i++) {
             FireParticle &p = f->subParticles[j * num_particles + i];
             Vector3D pos = p.position;
@@ -242,7 +241,7 @@ void FireworkSimulator::drawWireframe(GLShader &shader) {
             blink_states.col(i) << blinkval;
           }
           nanogui::Color damping_color(f->color.r(), f->color.g(), f->color.b(),
-              f->color.w() * trail_size);
+                                       f->color.w() * trail_size);
           shader.setUniform("u_color", damping_color, false);
           shader.uploadAttrib("in_position", positions, false);
           shader.uploadAttrib("in_particle_size", particle_sizes, false);
@@ -270,7 +269,7 @@ void FireworkSimulator::drawWireframe(GLShader &shader) {
 //        particle_sizes.resize(1, 1);
 //        blink_states.resize(1, 1);
 //
-        Vector3D pos = f->igniteParticle->position;
+      Vector3D pos = f->igniteParticle->position;
 //        positions.col(0) << pos.x, pos.y, pos.z, 1.0;
 //        particle_sizes.col(0) << f->particle_size * 20.0;
 //        blink_states.col(0) << 1;
@@ -281,9 +280,9 @@ void FireworkSimulator::drawWireframe(GLShader &shader) {
 //        shader.uploadAttrib("in_blink", blink_states, false);
 //        shader.drawArray(GL_POINTS, 0, 1);
 
-        Light l(pos, f->color, std::max((float)0.0,(float)(f->igniteParticle->lifetime * 0.2f)));
+      Light l(pos, f->color, std::max((float)0.0,(float)(f->igniteParticle->lifetime * 0.2f)));
 
-        fire_lights.push_back(l);
+      fire_lights.push_back(l);
 
     } else if (f->status == IGNITING) {
 
@@ -307,6 +306,36 @@ void FireworkSimulator::drawWireframe(GLShader &shader) {
       fire_lights.push_back(l);
     }
   }
+
+//  for (auto s: smokes) {
+//    if (s->status == DEAD){
+//      continue;
+//    }
+//
+//    if (s->status == LIVING) {
+//      num_particles = s->particles.size();
+//
+//      positions.resize(4, num_particles);
+//      colors.resize(4, num_particles);
+//      particle_sizes.resize(1, num_particles);
+//      blink_states.resize(1, num_particles);
+//
+//      for (int i = 0; i < num_particles; i++) {
+//        SmokeParticle &p = s->particles[i];
+//        Vector3D pos = p.position;
+//        positions.col(i) << pos.x, pos.y, pos.z, 1.0;
+//        particle_sizes.col(i) << s->particle_size * p.lifetime;
+//        int blinkval = 0;
+//        blink_states.col(i) << blinkval;
+//      }
+//      shader.setUniform("u_color", s->color, false);
+//      shader.uploadAttrib("in_position", positions, false);
+//      shader.uploadAttrib("in_particle_size", particle_sizes, false);
+//      shader.uploadAttrib("in_blink", blink_states, false);
+//      shader.drawArray(GL_POINTS, 0, num_particles);
+//    }
+//  }
+
 
 }
 
