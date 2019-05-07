@@ -12,8 +12,8 @@ void main() {
     if(dist > 0.5){
         discard;
     }else{
-            out_color += vec4(1.0,1.0,1.0,0.0) * (0.5 - dist);
-            out_color.a *= 2.0 * (0.5 - dist);
+        out_color += vec4(1.0,1.0,1.0,0.0) * (0.5 - dist);
+        out_color.a *= 2.0 * (0.5 - dist);
     }
 }
 

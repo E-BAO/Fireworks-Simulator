@@ -13,9 +13,19 @@
 
 using namespace nanogui;
 
+#define MAX_LIGHT_NUM 10
+
 struct UserShader;
 
 enum ShaderTypeHint { SIMPLE = 0, NORMALS = 1, PHONG = 2, PLANE = 3 };
+
+struct Light{
+    Vector3D pos;
+    nanogui::Color intensity;
+    float kd;
+    Light():kd(0){};
+    Light(Vector3D p, nanogui::Color c, float k):kd(k), intensity(c), pos(p){};
+};
 
 class FireworkSimulator {
 public:
@@ -43,6 +53,7 @@ private:
     // Default simulation values
     vector<Firework*> fireworks;
     void drawWireframe(GLShader &shader);
+    vector<Light> fire_lights;
 
     // File management
 

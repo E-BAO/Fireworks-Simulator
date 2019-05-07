@@ -45,12 +45,10 @@ void Firework::simulate(double frames_per_sec, double simulation_steps, vector<V
       if (trail)
         subParticles.resize((int) density * subNum);
       initExplosion();  //fireworks shape here
-      delete (igniteParticle);
     }
   }
 
   if (status == EXPLODING) {
-
     if (trail) {
       int particleNum = particles.size();
       for (int i = subNum - 1; i >= 0; --i) {
@@ -61,18 +59,23 @@ void Firework::simulate(double frames_per_sec, double simulation_steps, vector<V
             Vector3D dampAc = -(subP.velocity).unit() * (subP.velocity).norm2() * damping;
             subP.velocity += dampAc * delta_t;
             subP.position += dampAc * pow(delta_t, 2);
+              for (auto ac: external_accelerations) {
+                  subP.velocity += ac * delta_t;
+                  subP.position += ac * pow(delta_t, 2);
+              }
           }
         }
       }
       collisionStep += 1;
     }
 
+    int valid = 0;
     for (FireParticle &p: particles) {
       p.lifetime -= delta_t;
       if (p.lifetime < EPS_F) {
-        status = DIED;
         continue;
       }
+      valid ++;
       p.position += p.velocity * delta_t;
       //add damping here in or out ???
       Vector3D dampAc = -(p.velocity).unit() * (p.velocity).norm2() * damping;
@@ -83,6 +86,23 @@ void Firework::simulate(double frames_per_sec, double simulation_steps, vector<V
         p.velocity += ac * delta_t;
         p.position += ac * pow(delta_t, 2);
       }
+    }
+
+      igniteParticle->position += igniteParticle->velocity * delta_t;
+      igniteParticle->lifetime -= delta_t;
+      //add damping here in or out ???
+      Vector3D dampAc = -(igniteParticle->velocity).unit() * (igniteParticle->velocity).norm2() * damping;
+      igniteParticle->velocity += dampAc * delta_t;
+      igniteParticle->position += dampAc * pow(delta_t, 2);
+
+      for (auto ac: external_accelerations) {
+          igniteParticle->position += ac * pow(delta_t, 2);
+          igniteParticle->velocity += ac * delta_t;
+      }
+
+    if(valid == 0){
+        delete igniteParticle;
+        status = DIED;
     }
   }
 }
@@ -100,6 +120,7 @@ Vector3D random_uni_velocity() {
 }
 
 void Firework::initExplosion() {
+
   srand(time(nullptr));
   for (FireParticle &p: particles) {
     p.position = igniteParticle->position;
@@ -123,7 +144,12 @@ void Firework::initExplosion() {
       }
     }
     // seashell shape
-    if (shape == SEASHELL)
-      p.velocity += 2 * startVelocity;
+    if (shape == SEASHELL) {
+        p.velocity += 2 * startVelocity;
+    }
+
+      igniteParticle -> lifetime = 1.0;
+      igniteParticle->mass = shape == SPHERICAL ? 0.5 : 1.0;
+
   }
 }

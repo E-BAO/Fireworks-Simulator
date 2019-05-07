@@ -269,7 +269,9 @@ public:
     void downloadAttrib(const std::string &name, size_t size, int dim,
                        uint32_t compSize, GLuint glType, void *data);
 
-protected:
+    GLuint mProgramShader;
+
+    protected:
     /**
      * \struct Buffer glutil.h nanogui/glutil.h
      *
@@ -288,7 +290,6 @@ protected:
     GLuint mVertexShader;
     GLuint mFragmentShader;
     GLuint mGeometryShader;
-    GLuint mProgramShader;
     GLuint mVertexArrayObject;
     std::map<std::string, Buffer> mBufferObjects;
     std::map<std::string, std::string> mDefinitions;

@@ -52,9 +52,6 @@ void Plane::render(GLShader &shader) {
   if (shader.attrib("in_normal", false) != -1) {
       shader.uploadAttrib("in_normal", normals);
   }
-  if (shader.attrib("in_blink", false) != -1) {
-      shader.uploadAttrib("in_blink", blink_states);
-  }
 
   shader.drawArray(GL_TRIANGLE_STRIP, 0, 4);
 }

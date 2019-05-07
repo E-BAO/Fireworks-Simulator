@@ -131,13 +131,10 @@ void FireworkSimulator::init() {
 
 
 void FireworkSimulator::drawContents() {
-    glEnable(GL_DEPTH_TEST);
+//    glEnable(GL_DEPTH_TEST);
 
     const UserShader &plane_shader = shaders[1];
 
-
-    GLShader shader0 = plane_shader.nanogui_shader;
-    shader0.bind();
 
     // Prepare the camera projection matrix
 
@@ -149,26 +146,53 @@ void FireworkSimulator::drawContents() {
 
     Matrix4f viewProjection = projection * view;
 
+
+    GLShader shader0 = plane_shader.nanogui_shader;
+    shader0.bind();
     shader0.setUniform("u_model", model);
     shader0.setUniform("u_view_projection", viewProjection);
+    shader0.setUniform("u_view_projection", viewProjection);
+
+    int light_size = min((int)MAX_LIGHT_NUM,(int)fire_lights.size());
+    shader0.setUniform("u_light_num", light_size, false);
+
+    float light_pos[light_size][3];
+    float light_intensity[light_size][3];
+    float light_kd[light_size];
+    for(int i = 0; i< light_size; i ++){
+        nanogui::Color &light_int = fire_lights[i].intensity;
+        light_intensity[i][0] = light_int.r();
+        light_intensity[i][1] = light_int.g();
+        light_intensity[i][2] = light_int.b();
+
+        Vector3D &light = fire_lights[i].pos;
+        light_pos[i][0] = light.x;
+        light_pos[i][1] = light.y;
+        light_pos[i][2] = light.z;
+
+        light_kd[i] = fire_lights[i].kd;
+    }
+
+    glUniform3fv(glGetUniformLocation(shader0.mProgramShader, "u_light_pos"), light_size, (const GLfloat*)light_pos);
+    glUniform3fv(glGetUniformLocation(shader0.mProgramShader, "u_light_intensity"), light_size, (const GLfloat*)light_intensity);
+    glUniform1fv(glGetUniformLocation(shader0.mProgramShader, "u_kd"), light_size, (const GLfloat*)light_kd);
+    fire_lights.resize(0);
 
     for (CollisionObject *co : *collision_objects) {
         co->render(shader0);
     }
 
-    glDisable(GL_DEPTH_TEST);
-
     if (!is_paused) {
-    vector<Vector3D> external_accelerations = {gravity};
+        vector<Vector3D> external_accelerations = {gravity};
 
-    for (Firework *f: fireworks) {
-      for (int i = 0; i < simulation_steps; i++) {
-        f->simulate(frames_per_sec, simulation_steps, external_accelerations);
-      }
+        for (Firework *f: fireworks) {
+          for (int i = 0; i < simulation_steps; i++) {
+            f->simulate(frames_per_sec, simulation_steps, external_accelerations);
+          }
+        }
     }
-  }
 
-  // Bind the active shader
+    // Bind the active shader
 
   const UserShader &active_shader = shaders[0];
 
@@ -180,9 +204,6 @@ void FireworkSimulator::drawContents() {
 
   drawWireframe(shader);
 
-  for (CollisionObject *co : *collision_objects) {
-    co->render(shader);
-  }
 }
 
 void FireworkSimulator::drawWireframe(GLShader &shader) {
@@ -195,8 +216,9 @@ void FireworkSimulator::drawWireframe(GLShader &shader) {
   MatrixXf blink_states;
 
   for (auto f: fireworks) {
-    if (f->status == DIED)
-      continue;
+    if (f->status == DIED){
+        continue;
+    }
 
     if (f->status == EXPLODING) {
 
@@ -211,17 +233,17 @@ void FireworkSimulator::drawWireframe(GLShader &shader) {
         int num_trail = f->subNum;
         for (int j = 0; j < num_trail; ++j) {
           for (int i = 0; i < num_particles; i++) {
+            float trial_size = pow(trail_damping, j + 1);
             FireParticle &p = f->subParticles[j * num_particles + i];
             Vector3D pos = p.position;
             positions.col(i) << pos.x, pos.y, pos.z, 1.0;
-            particle_sizes.col(i) << f->particle_size * pow(trail_damping, j + 1) * p.lifetime;
+            particle_sizes.col(i) << f->particle_size * trial_size * p.lifetime;
             int blinkval = f->blink ? rand() % 2 : 1;
             blink_states.col(i) << blinkval;
           }
           nanogui::Color damping_color = f->color;
           damping_color.w() *= pow(trail_damping, j + 1);
           shader.setUniform("u_color", damping_color, false);
-
           shader.uploadAttrib("in_position", positions, false);
           shader.uploadAttrib("in_particle_size", particle_sizes, false);
           shader.uploadAttrib("in_blink", blink_states, false);
@@ -237,21 +259,38 @@ void FireworkSimulator::drawWireframe(GLShader &shader) {
           blink_states.col(i) << blinkval;
         }
         shader.setUniform("u_color", f->color, false);
-
         shader.uploadAttrib("in_position", positions, false);
         shader.uploadAttrib("in_particle_size", particle_sizes, false);
         shader.uploadAttrib("in_blink", blink_states, false);
         shader.drawArray(GL_POINTS, 0, num_particles);
       }
 
+//        positions.resize(4, 1);
+//        colors.resize(4, 1);
+//        particle_sizes.resize(1, 1);
+//        blink_states.resize(1, 1);
+//
+        Vector3D pos = f->igniteParticle->position;
+//        positions.col(0) << pos.x, pos.y, pos.z, 1.0;
+//        particle_sizes.col(0) << f->particle_size * 20.0;
+//        blink_states.col(0) << 1;
+//
+//        shader.setUniform("u_color", nanogui::Color(0,1,1,1), false);
+//        shader.uploadAttrib("in_position", positions, false);
+//        shader.uploadAttrib("in_particle_size", particle_sizes, false);
+//        shader.uploadAttrib("in_blink", blink_states, false);
+//        shader.drawArray(GL_POINTS, 0, 1);
+
+        Light l(pos, f->color, std::max((float)0.0,(float)(f->igniteParticle->lifetime * 0.2f)));
+
+        fire_lights.push_back(l);
+
     } else if (f->status == IGNITING) {
-      num_particles = 1;
 
       positions.resize(4, 1);
       colors.resize(4, 1);
       particle_sizes.resize(1, 1);
       blink_states.resize(1, 1);
-
 
       Vector3D pos = f->igniteParticle->position;
       positions.col(0) << pos.x, pos.y, pos.z, 1.0;
@@ -259,11 +298,13 @@ void FireworkSimulator::drawWireframe(GLShader &shader) {
       blink_states.col(0) << 1;
 
       shader.setUniform("u_color", f->color, false);
-
       shader.uploadAttrib("in_position", positions, false);
       shader.uploadAttrib("in_particle_size", particle_sizes, false);
       shader.uploadAttrib("in_blink", blink_states, false);
       shader.drawArray(GL_POINTS, 0, 1);
+
+      Light l(pos, f->color, 0.02f);
+      fire_lights.push_back(l);
     }
   }
 
