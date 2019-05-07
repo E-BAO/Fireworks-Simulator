@@ -75,10 +75,10 @@ private:
     float density = 200;
     float energy = 3;
     float damping = 1;
-    float particle_size = 15;
+    float particle_size = 20;
     bool enable_blink = false;
     bool enable_trail = false;
-    float trail_damping = .9;
+    float trail_damping = .92;
     FireworkShape shape = FireworkShape::DISPERSED;
 
 

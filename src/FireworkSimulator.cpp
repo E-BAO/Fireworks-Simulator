@@ -232,17 +232,17 @@ void FireworkSimulator::drawWireframe(GLShader &shader) {
       if (f->trail) {
         int num_trail = f->subNum;
         for (int j = 0; j < num_trail; ++j) {
+          float trail_size = ceil(pow(trail_damping, j));
           for (int i = 0; i < num_particles; i++) {
-            float trial_size = pow(trail_damping, j + 1);
             FireParticle &p = f->subParticles[j * num_particles + i];
             Vector3D pos = p.position;
             positions.col(i) << pos.x, pos.y, pos.z, 1.0;
-            particle_sizes.col(i) << f->particle_size * trial_size * p.lifetime;
+            particle_sizes.col(i) << f->particle_size * trail_size * p.lifetime;
             int blinkval = f->blink ? rand() % 2 : 1;
             blink_states.col(i) << blinkval;
           }
           nanogui::Color damping_color(f->color.r(), f->color.g(), f->color.b(),
-              f->color.w() * pow(trail_damping, j));
+              f->color.w() * trail_size);
           shader.setUniform("u_color", damping_color, false);
           shader.uploadAttrib("in_position", positions, false);
           shader.uploadAttrib("in_particle_size", particle_sizes, false);

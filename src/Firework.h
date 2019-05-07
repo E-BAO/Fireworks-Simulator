@@ -43,7 +43,7 @@ public:
     bool blink;
     bool trail;
     FireworkShape shape;
-    int subNum = 8;
+    int subNum = 10;
 
 private:
     float density;
