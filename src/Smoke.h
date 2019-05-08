@@ -29,7 +29,7 @@ public:
   SmokeStatus status;
   vector<SmokeParticle> particles;
   float particle_size;
-  nanogui::Color color = nanogui::Color(0.5f, 0.5f, 0.5f, 0.1f);
+  nanogui::Color color = nanogui::Color(0.4f, 0.4f, 0.4f, 0.1f);
 
 private:
   Vector3D rand_pos();

@@ -35,7 +35,7 @@ Vector3D Smoke::rand_pos() {
 Vector3D Smoke::rand_acc() {
   float accX, accY, accZ;
   accX = (((float) std::rand()) / RAND_MAX - 0.5) * coefX;
-  accY = (((float) std::rand()) / RAND_MAX - 0.2) * coefY;
+  accY = (((float) std::rand()) / RAND_MAX - 0.3) * coefY;
   accZ = (((float) std::rand()) / RAND_MAX - 0.5) * coefX;
 
   return Vector3D(accX, accY, accZ);
