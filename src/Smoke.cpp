@@ -25,7 +25,7 @@ Smoke::~Smoke() {}
 
 Vector3D Smoke::rand_pos() {
   float theta, phi, rho;
-  rho = ((float) std::rand()) / RAND_MAX / 10.;
+  rho = ((float) std::rand()) / RAND_MAX / 5.;
   theta = ((float) std::rand()) / RAND_MAX * 2 * PI;
   phi = ((float) std::rand()) / RAND_MAX * 2 * PI;
 
