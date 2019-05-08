@@ -190,6 +190,12 @@ void FireworkSimulator::drawContents() {
             f->simulate(frames_per_sec, simulation_steps, external_accelerations);
           }
         }
+
+      for (Smoke *s: smokes) {
+        for (int i = 0; i < simulation_steps; i++) {
+          s->simulate(frames_per_sec, simulation_steps);
+        }
+      }
     }
 
     // Bind the active shader
@@ -214,6 +220,7 @@ void FireworkSimulator::drawWireframe(GLShader &shader) {
   MatrixXf colors;
   MatrixXf particle_sizes;
   MatrixXf blink_states;
+
   for (auto f: fireworks) {
     if (f->status == DIED){
       continue;
@@ -231,7 +238,7 @@ void FireworkSimulator::drawWireframe(GLShader &shader) {
       if (f->trail) {
         int num_trail = f->subNum;
         for (int j = 0; j < num_trail; ++j) {
-          float trail_size = pow(trail_damping, j);
+          float trail_size = pow(trail_damping, j + 2);
           for (int i = 0; i < num_particles; i++) {
             FireParticle &p = f->subParticles[j * num_particles + i];
             Vector3D pos = p.position;
@@ -284,6 +291,12 @@ void FireworkSimulator::drawWireframe(GLShader &shader) {
 
       fire_lights.push_back(l);
 
+      if (f->exploded % smoke_skip == 0 and f->exploded / smoke_skip < smoke_frame) {
+        Smoke  *s = new Smoke(f->ignitePos, f->igniteVel);
+        smokes.push_back(s);
+        f->exploded += 1;
+      }
+
     } else if (f->status == IGNITING) {
 
       positions.resize(4, 1);
@@ -307,34 +320,36 @@ void FireworkSimulator::drawWireframe(GLShader &shader) {
     }
   }
 
-//  for (auto s: smokes) {
-//    if (s->status == DEAD){
-//      continue;
-//    }
-//
-//    if (s->status == LIVING) {
-//      num_particles = s->particles.size();
-//
-//      positions.resize(4, num_particles);
-//      colors.resize(4, num_particles);
-//      particle_sizes.resize(1, num_particles);
-//      blink_states.resize(1, num_particles);
-//
-//      for (int i = 0; i < num_particles; i++) {
-//        SmokeParticle &p = s->particles[i];
-//        Vector3D pos = p.position;
-//        positions.col(i) << pos.x, pos.y, pos.z, 1.0;
-//        particle_sizes.col(i) << s->particle_size * p.lifetime;
-//        int blinkval = 0;
-//        blink_states.col(i) << blinkval;
-//      }
-//      shader.setUniform("u_color", s->color, false);
-//      shader.uploadAttrib("in_position", positions, false);
-//      shader.uploadAttrib("in_particle_size", particle_sizes, false);
-//      shader.uploadAttrib("in_blink", blink_states, false);
-//      shader.drawArray(GL_POINTS, 0, num_particles);
-//    }
-//  }
+  for (auto s: smokes) {
+    if (s->status == DEAD){
+      continue;
+    }
+
+    if (s->status == LIVING) {
+      num_particles = s->particles.size();
+
+      positions.resize(4, num_particles);
+      colors.resize(4, num_particles);
+      particle_sizes.resize(1, num_particles);
+      blink_states.resize(1, num_particles);
+
+      for (int i = 0; i < num_particles; i++) {
+        SmokeParticle &p = s->particles[i];
+        Vector3D pos = p.position;
+        positions.col(i) << pos.x, pos.y, pos.z, 1.0;
+        particle_sizes.col(i) << s->particle_size;
+        int blinkval = 1;
+        blink_states.col(i) << blinkval;
+      }
+
+      nanogui::Color s_color = s->color;
+      shader.setUniform("u_color", s->color, false);
+      shader.uploadAttrib("in_position", positions, false);
+      shader.uploadAttrib("in_particle_size", particle_sizes, false);
+      shader.uploadAttrib("in_blink", blink_states, false);
+      shader.drawArray(GL_POINTS, 0, num_particles);
+    }
+  }
 
 
 }
@@ -397,7 +412,7 @@ void FireworkSimulator::initGUI(Screen *screen) {
         new BoxLayout(Orientation::Horizontal, Alignment::Middle, 0, 5));
 
     Slider *slider = new Slider(panel);
-    slider->setValue(density / 2000);
+    slider->setValue(density / 1000);
     slider->setFixedWidth(105);
 
     TextBox *damping_coef = new TextBox(panel);
@@ -408,10 +423,10 @@ void FireworkSimulator::initGUI(Screen *screen) {
     damping_coef->setFontSize(14);
 
     slider->setCallback([damping_coef](float value) {
-      damping_coef->setValue(std::to_string(int(value * 2000)));
+      damping_coef->setValue(std::to_string(int(value * 1000)));
     });
     slider->setFinalCallback([&](float value) {
-      density = (double) value * 2000;
+      density = (double) value * 1000;
     });
   }
 

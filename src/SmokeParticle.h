@@ -22,7 +22,7 @@ public:
   // dynamic values
   Vector3D position;
   Vector3D velocity;
-  float lifetime = 5.0;
+  float lifetime = 2.0;
 };
 
 

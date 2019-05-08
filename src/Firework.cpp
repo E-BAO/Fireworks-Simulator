@@ -14,6 +14,7 @@ Firework::Firework(Vector3D startPos, Vector3D velocity, float density, float en
     status = FireworkStatus::IGNITING;
     igniteParticle = new FireParticle(startPos, velocity);
     trailLen *= particle_size;
+    exploded = 0;
     if (shape == SPARKLER)
         startVelocity /= 2;
     std::cout << "new fireworks here " << std::endl;
@@ -49,6 +50,9 @@ void Firework::simulate(double frames_per_sec, double simulation_steps, vector<V
             igniteParticle->velocity = lastVec;
             particles.resize((int) density);
             initExplosion();  //fireworks shape here
+            // for smoke
+            ignitePos = lastPos;
+            igniteVel = lastVec;
         }
     }
 

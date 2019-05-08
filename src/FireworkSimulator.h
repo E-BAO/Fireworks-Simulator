@@ -53,7 +53,7 @@ private:
 
     // Default simulation values
     vector<Firework*> fireworks;
-  vector<Smoke*> smokes;
+    vector<Smoke*> smokes;
     void drawWireframe(GLShader &shader);
     vector<Light> fire_lights;
 
@@ -82,6 +82,8 @@ private:
     bool enable_trail = false;
     float trail_damping = 0.92;
     FireworkShape shape = FireworkShape::DISPERSED;
+    int smoke_frame = 10;
+    int smoke_skip = 6;
 
 
     vector<CollisionObject *> *collision_objects;

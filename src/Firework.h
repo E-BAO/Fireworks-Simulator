@@ -43,7 +43,12 @@ public:
     bool blink;
     bool trail;
     FireworkShape shape;
-    int subNum = 10;
+    int subNum = 8;
+
+    // for smoke
+    Vector3D ignitePos;
+    Vector3D igniteVel;
+    int exploded;
 
 private:
     float density;
@@ -51,7 +56,8 @@ private:
     float damping;
     Vector3D  startVelocity;
     int collisionStep = 0;
-    float trailLen = 0.007;
+//    float trailLen = 0.007;
+  float trailLen = 0.03;
     int totalSteps = 0;
 };
 

@@ -69,7 +69,7 @@ link_directories(
 #-------------------------------------------------------------------------------
 # Add executable
 #-------------------------------------------------------------------------------
-add_executable(clothsim ${CLOTHSIM_VIEWER_SOURCE} SmokeParticle.cpp SmokeParticle.h Smoke.cpp Smoke.h)
+add_executable(clothsim ${CLOTHSIM_VIEWER_SOURCE} SmokeParticle.h Smoke.cpp Smoke.h)
 
 target_link_libraries(clothsim
     CGL ${CGL_LIBRARIES}

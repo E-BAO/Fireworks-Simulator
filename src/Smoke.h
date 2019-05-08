@@ -20,8 +20,8 @@ enum SmokeStatus { LIVING = 0, DEAD = 1 };
 class Smoke {
 
 public:
-  Smoke(Vector3D startPos = Vector3D(0,0,0), Vector3D velocity = Vector3D(0,0,0), float density = 10.0,
-  float particle_size = 30.0);
+  Smoke(Vector3D startPos = Vector3D(0,0,0), Vector3D velocity = Vector3D(0,0,0), float density = 30.0,
+  float particle_size = 50.0, float range = 0.15);
   ~Smoke();
 
   void simulate(double frames_per_sec, double simulation_steps);
@@ -29,14 +29,17 @@ public:
   SmokeStatus status;
   vector<SmokeParticle> particles;
   float particle_size;
-  nanogui::Color color = nanogui::Color(1.0f, 1.0f, 1.0f, 0.1f);
+  nanogui::Color color = nanogui::Color(0.5f, 0.5f, 0.5f, 0.1f);
 
 private:
+  Vector3D rand_pos();
   Vector3D rand_acc();
 
   float density;
-  float coefX = 0.00007;
-  float coefY = 0.0001;
+  float range;
+  float coefX = 180;
+  float coefY = 15;
+  float damping = 0.9995;
 
 };
 
