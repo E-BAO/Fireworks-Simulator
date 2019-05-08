@@ -4,6 +4,8 @@
 
 #include "Firework.h"
 
+Audio* Firework::audio = new Audio("../sounds/jiu.wav");
+
 Firework::Firework(Vector3D startPos, Vector3D velocity, float density, float energy, float damping,
                    float particle_size, bool blink, bool trail, FireworkShape shape) : startVelocity(velocity),
                                                                                        density(density),
@@ -21,7 +23,9 @@ Firework::Firework(Vector3D startPos, Vector3D velocity, float density, float en
 }
 
 
-Firework::~Firework() {}
+Firework::~Firework() {
+    delete audio;
+}
 
 void Firework::simulate(double frames_per_sec, double simulation_steps, vector<Vector3D> external_accelerations) {
 //    std::cout<< " firework simulate "<< std::endl;
@@ -49,6 +53,8 @@ void Firework::simulate(double frames_per_sec, double simulation_steps, vector<V
             igniteParticle->position = lastPos;
             igniteParticle->velocity = lastVec;
             particles.resize((int) density);
+            audio->play();
+
             initExplosion();  //fireworks shape here
             // for smoke
             ignitePos = lastPos;

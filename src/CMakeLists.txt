@@ -24,7 +24,11 @@ set(CLOTHSIM_VIEWER_SOURCE
     misc/file_utils.cpp
 
     # Camera
-    camera.cpp FireParticle.cpp)
+    camera.cpp FireParticle.cpp
+
+    # sound
+    Audio.cpp Audio.h
+        )
 
 # Windows-only sources
 if(WIN32)
@@ -56,6 +60,7 @@ include_directories(
   ${CGL_INCLUDE_DIRS}
   ${FREETYPE_INCLUDE_DIRS}
   ${NANOGUI_EXTRA_INCS}
+  ${OPENAL_INCLUDE_DIR}
 )
 
 #-------------------------------------------------------------------------------
@@ -64,18 +69,20 @@ include_directories(
 link_directories(
   ${CGL_LIBRARY_DIRS}
   ${FREETYPE_LIBRARY_DIRS}
+  ${OPENAL_LIBRARY_DIRS}
 )
 
 #-------------------------------------------------------------------------------
 # Add executable
 #-------------------------------------------------------------------------------
-add_executable(clothsim ${CLOTHSIM_VIEWER_SOURCE} SmokeParticle.h Smoke.cpp Smoke.h)
+add_executable(clothsim ${CLOTHSIM_VIEWER_SOURCE} SmokeParticle.h Smoke.cpp Smoke.h )
 
 target_link_libraries(clothsim
     CGL ${CGL_LIBRARIES}
     nanogui ${NANOGUI_EXTRA_LIBS}
     ${FREETYPE_LIBRARIES}
     ${CMAKE_THREADS_INIT}
+    ${OPENAL_LIBRARY}
 )
 
 add_executable(firework_simulator ${CLOTHSIM_VIEWER_SOURCE})
@@ -85,6 +92,7 @@ target_link_libraries(firework_simulator
         nanogui ${NANOGUI_EXTRA_LIBS}
         ${FREETYPE_LIBRARIES}
         ${CMAKE_THREADS_INIT}
+        ${OPENAL_LIBRARY}
         )
 
 #-------------------------------------------------------------------------------

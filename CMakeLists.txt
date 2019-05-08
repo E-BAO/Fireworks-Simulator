@@ -200,6 +200,14 @@ else(BUILD_LIBCGL)
   find_package(CGL REQUIRED)
 endif(BUILD_LIBCGL)
 
+# OpenAL
+FIND_PACKAGE(OpenAL REQUIRED)
+IF(OPENAL_FOUND)
+    INCLUDE_DIRECTORIES(${OPENAL_INCLUDE_DIR})
+    LINK_LIBRARIES(${OPENAL_LIBRARY})
+    include_directories(${OPENAL_INCLUDE_DIR})
+ENDIF()
+
 #-------------------------------------------------------------------------------
 # Add subdirectories
 #-------------------------------------------------------------------------------

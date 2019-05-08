@@ -14,6 +14,7 @@
 #include "clothMesh.h"
 #include "FireParticle.h"
 #include <nanogui/nanogui.h>
+#include "Audio.h"
 
 using namespace CGL;
 using namespace std;
@@ -57,8 +58,9 @@ private:
     Vector3D  startVelocity;
     int collisionStep = 0;
 //    float trailLen = 0.007;
-  float trailLen = 0.03;
+    float trailLen = 0.03;
     int totalSteps = 0;
+    static Audio *audio;
 };
 
 
