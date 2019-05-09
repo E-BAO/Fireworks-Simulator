@@ -5,7 +5,7 @@
 #include "Smoke.h"
 
 Smoke::Smoke(Vector3D startPos, Vector3D velocity, float density, float particle_size,
-    float range) : density(density),particle_size(particle_size), range(range)  {
+             float range) : density(density), particle_size(particle_size), range(range) {
   status = LIVING;
   particles.resize((int) density);
   coefX *= range;
@@ -25,17 +25,17 @@ Smoke::~Smoke() {}
 
 Vector3D Smoke::rand_pos() {
   float theta, phi, rho;
-  rho = ((float) std::rand()) / RAND_MAX / 7.;
+  rho = ((float) std::rand()) / RAND_MAX * range;
   theta = ((float) std::rand()) / RAND_MAX * 2 * PI;
   phi = ((float) std::rand()) / RAND_MAX * 2 * PI;
 
-  return Vector3D(rho * cos(phi) * cos(theta), rho * cos(phi) * sin(theta), rho * sin(phi));
+  return Vector3D(rho * pow(cos(phi) * cos(theta), 2), rho * pow(cos(phi) * sin(theta), 2), rho * pow(sin(phi), 2));
 }
 
 Vector3D Smoke::rand_acc() {
   float accX, accY, accZ;
   accX = (((float) std::rand()) / RAND_MAX - 0.5) * coefX;
-  accY = (((float) std::rand()) / RAND_MAX - 0.3) * coefY;
+  accY = (((float) std::rand()) / RAND_MAX - 0.45) * coefY;
   accZ = (((float) std::rand()) / RAND_MAX - 0.5) * coefX;
 
   return Vector3D(accX, accY, accZ);

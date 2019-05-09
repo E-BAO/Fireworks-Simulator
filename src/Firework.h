@@ -61,6 +61,7 @@ private:
     float trailLen = 0.03;
     int totalSteps = 0;
     static Audio *audio;
+    bool hasBiu = false;
 };
 
 

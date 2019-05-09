@@ -4,7 +4,7 @@
 
 #include "Firework.h"
 
-Audio* Firework::audio = new Audio("../sounds/jiu.wav");
+Audio* Firework::audio = new Audio("../sounds/biu.wav");
 
 Firework::Firework(Vector3D startPos, Vector3D velocity, float density, float energy, float damping,
                    float particle_size, bool blink, bool trail, FireworkShape shape) : startVelocity(velocity),
@@ -33,6 +33,14 @@ void Firework::simulate(double frames_per_sec, double simulation_steps, vector<V
     double delta_t = 1.0f / frames_per_sec / simulation_steps;
 
     int initStep = (frames_per_sec * simulation_steps / 20);
+
+
+    if (not hasBiu) {
+        Firework::audio = new Audio("../sounds/biu.wav");
+        audio->play();
+        hasBiu = true;
+    }
+
     if(shape == SPARKLER and totalSteps%initStep == 0 and totalSteps < initStep * 10) {
         initExplosion(false);
     }
@@ -53,6 +61,7 @@ void Firework::simulate(double frames_per_sec, double simulation_steps, vector<V
             igniteParticle->position = lastPos;
             igniteParticle->velocity = lastVec;
             particles.resize((int) density);
+            Firework::audio = new Audio("../sounds/pong.wav");
             audio->play();
 
             initExplosion();  //fireworks shape here
