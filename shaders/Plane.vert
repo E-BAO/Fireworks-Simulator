@@ -11,6 +11,11 @@ out vec4 v_color;
 out vec4 v_position;
 out vec4 v_normal;
 
+//in vec2 in_uv;
+
+//out vec2 v_uv;
+
+
 void main() {
     gl_Position = u_view_projection * u_model * in_position;
 
@@ -19,4 +24,5 @@ void main() {
 
 
     v_color = u_color;
+//    v_uv = in_uv;
 }

@@ -26,6 +26,31 @@ using namespace nanogui;
 using namespace std;
 
 
+Vector3D load_texture(int frame_idx, GLuint handle, const char* where) {
+    Vector3D size_retval;
+
+    if (strlen(where) == 0) return size_retval;
+
+    glActiveTexture(GL_TEXTURE0 + frame_idx);
+    glBindTexture(GL_TEXTURE_2D, handle);
+
+
+    int img_x, img_y, img_n;
+    unsigned char* img_data = stbi_load(where, &img_x, &img_y, &img_n, 3);
+    size_retval.x = img_x;
+    size_retval.y = img_y;
+    size_retval.z = img_n;
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, img_x, img_y, 0, GL_RGB, GL_UNSIGNED_BYTE, img_data);
+    stbi_image_free(img_data);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+    return size_retval;
+}
+
 void FireworkSimulator::load_shaders() {
   std::set<std::string> shader_folder_contents;
   bool success = FileUtils::list_files_in_directory(m_project_root + "/shaders", shader_folder_contents);
@@ -68,18 +93,77 @@ void FireworkSimulator::load_shaders() {
 
     shaders.push_back(smoke_shader);
 
+    shader_name = "Texture";
+    shader_fname = "Texture.frag";
+    vert_shader = m_project_root + "/shaders/Texture.vert";
+    GLShader texture_nanugui_shader;
+    texture_nanugui_shader.initFromFiles(shader_name, vert_shader,
+                                       m_project_root + "/shaders/" + shader_fname);
+    hint = ShaderTypeHint::TEXTURE;
+    UserShader texture_shader(shader_name, texture_nanugui_shader, hint);
+
+    shaders.push_back(texture_shader);
+}
+
+void load_cubemap(int frame_idx, GLuint handle, const std::vector<std::string>& file_locs) {
+    glActiveTexture(GL_TEXTURE0 + frame_idx);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, handle);
+    for (int side_idx = 0; side_idx < 6; ++side_idx) {
+
+        int img_x, img_y, img_n;
+        unsigned char* img_data = stbi_load(file_locs[side_idx].c_str(), &img_x, &img_y, &img_n, 3);
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + side_idx, 0, GL_RGB, img_x, img_y, 0, GL_RGB, GL_UNSIGNED_BYTE, img_data);
+        stbi_image_free(img_data);
+        std::cout << "Side " << side_idx << " has dimensions " << img_x << ", " << img_y << std::endl;
+
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    }
+}
+
+void FireworkSimulator::load_textures() {
+    glGenTextures(1, &m_gl_texture_1);
+    glGenTextures(2, &m_gl_texture_2);
+    glGenTextures(3, &m_gl_texture_3);
+//    glGenTextures(4, &m_gl_texture_4);
+//    glGenTextures(5, &m_gl_texture_5);
+//    glGenTextures(6, &m_gl_texture_6);
+
+    m_gl_texture_1_size = load_texture(1, m_gl_texture_1, (m_project_root + "/textures/sky_box/nec_city.jpg").c_str());
+    m_gl_texture_2_size = load_texture(2, m_gl_texture_2, (m_project_root + "/textures/texture_2.png").c_str());
+    m_gl_texture_3_size = load_texture(3, m_gl_texture_3, (m_project_root + "/textures/texture_3.png").c_str());
+//    m_gl_texture_4_size = load_texture(4, m_gl_texture_4, (m_project_root + "/textures/texture_4.png").c_str());
+
+    std::cout << "Texture 1 loaded with size: " << m_gl_texture_1_size << std::endl;
+    std::cout << "Texture 2 loaded with size: " << m_gl_texture_2_size << std::endl;
+    std::cout << "Texture 3 loaded with size: " << m_gl_texture_3_size << std::endl;
+//    std::cout << "Texture 4 loaded with size: " << m_gl_texture_4_size << std::endl;
+
+
 }
 
 FireworkSimulator::FireworkSimulator(std::string project_root, Screen *screen) : m_project_root(project_root) {
   this->screen = screen;
   this->load_shaders();
+  this->load_textures();
 
   glEnable(GL_PROGRAM_POINT_SIZE);
   glEnable(GL_DEPTH_TEST);
 }
 
 FireworkSimulator::~FireworkSimulator() {
+    for (auto shader : shaders) {
+        shader.nanogui_shader.free();
+    }
+    glDeleteTextures(1, &m_gl_texture_1);
+    glDeleteTextures(1, &m_gl_texture_2);
+    glDeleteTextures(1, &m_gl_texture_3);
+//    glDeleteTextures(1, &m_gl_texture_4);
 
+    if (collision_objects) delete collision_objects;
 }
 
 
@@ -137,14 +221,15 @@ void FireworkSimulator::init() {
 
   plane = new Plane(point, normal, friction);
   collision_objects->push_back(plane);
-//    cout <<plane->p0 << " "<<plane->p1 << " "<<plane->p2<<" "<<plane->p3<<endl;
+
+
+  skybox = new SkyBox(point, 3.0f);
 }
 
 
 void FireworkSimulator::drawContents() {
 //    glEnable(GL_DEPTH_TEST);
 
-    const UserShader &plane_shader = shaders[1];
 
 
     // Prepare the camera projection matrix
@@ -157,6 +242,24 @@ void FireworkSimulator::drawContents() {
 
     Matrix4f viewProjection = projection * view;
 
+
+    // Bind the skybox shader
+    const UserShader &skybox_u_shader = shaders[3];
+
+    GLShader skybox_shader = skybox_u_shader.nanogui_shader;
+    skybox_shader.bind();
+    skybox_shader.setUniform("u_model", model);
+    skybox_shader.setUniform("u_view_projection", viewProjection);
+    skybox_shader.setUniform("u_view_projection", viewProjection);
+
+    skybox_shader.setUniform("u_texture_1", 1, false);
+//    skybox_shader.setUniform("u_texture_2", 2, false);
+//    skybox_shader.setUniform("u_texture_3", 3, false);
+    skybox_shader.setUniform("u_texture_1_size", Vector2f(m_gl_texture_1_size.x, m_gl_texture_1_size.y), false);
+
+    skybox->render(skybox_shader);
+
+    const UserShader &plane_shader = shaders[1];
 
     GLShader shader0 = plane_shader.nanogui_shader;
     shader0.bind();

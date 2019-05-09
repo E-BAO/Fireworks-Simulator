@@ -35,6 +35,16 @@ void Plane::render(GLShader &shader) {
   MatrixXf normals(3, 4);
   MatrixXf blink_states = MatrixXf::Ones(1, 4);
 
+  Vector3f vec_1 = sPoint + 2 * (sCross + sParallel);
+  Vector3f vec_2 = sPoint + 2 * (sCross - sParallel);
+  Vector3f vec_3 = sPoint + 2 * (-sCross + sParallel);
+  Vector3f vec_4 = sPoint + 2 * (-sCross - sParallel);
+
+//    std::cout<<"vec1 "<< vec_1.x()<<" "<<vec_1.y() << " " << vec_1.z() << std::endl;
+//    std::cout<<"vec2 "<< vec_2.x()<<" "<<vec_2.y() << " " << vec_2.z() << std::endl;
+//    std::cout<<"vec3 "<< vec_3.x()<<" "<<vec_3.y() << " " << vec_3.z() << std::endl;
+//    std::cout<<"vec4 "<< vec_4.x()<<" "<<vec_4.y() << " " << vec_4.z() << std::endl;
+
   positions.col(0) << sPoint + 2 * (sCross + sParallel);
   positions.col(1) << sPoint + 2 * (sCross - sParallel);
   positions.col(2) << sPoint + 2 * (-sCross + sParallel);

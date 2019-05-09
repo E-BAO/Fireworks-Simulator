@@ -8,6 +8,7 @@ uniform vec3 u_light_pos[10];
 uniform int u_light_num;
 uniform vec3 u_light_intensity[10];
 uniform float u_kd[10];
+uniform sampler2D u_texture_1;
 
 // These are the inputs which are the outputs of the vertex shader.
 in vec4 v_position;

@@ -11,6 +11,7 @@
 #include "Firework.h"
 #include "Smoke.h"
 #include "collision/plane.h"
+#include "collision/SkyBox.h"
 
 using namespace nanogui;
 
@@ -18,7 +19,7 @@ using namespace nanogui;
 
 struct UserShader;
 
-enum ShaderTypeHint { SIMPLE = 0, NORMALS = 1, PHONG = 2, PLANE = 3, SMOKE = 4 };
+enum ShaderTypeHint { SIMPLE = 0, NORMALS = 1, PHONG = 2, PLANE = 3, SMOKE = 4, TEXTURE = 5 };
 
 struct Light{
     Vector3D pos;
@@ -50,6 +51,24 @@ public:
 private:
     virtual void initGUI(Screen *screen);
     void load_shaders();
+    void load_textures();
+
+    // OpenGL textures
+
+    Vector3D m_gl_texture_size;
+    Vector3D m_gl_texture_1_size;
+    Vector3D m_gl_texture_2_size;
+    Vector3D m_gl_texture_3_size;
+    Vector3D m_gl_texture_4_size;
+    Vector3D m_gl_texture_5_size;
+    Vector3D m_gl_texture_6_size;
+
+    GLuint m_gl_texture_1;
+    GLuint m_gl_texture_2;
+    GLuint m_gl_texture_3;
+    GLuint m_gl_texture_4;
+    GLuint m_gl_texture_5;
+    GLuint m_gl_texture_6;
 
     // Default simulation values
     vector<Firework*> fireworks;
@@ -143,6 +162,7 @@ private:
 
     bool is_alive = true;
     Plane *plane;
+    SkyBox *skybox;
 
     Vector2i default_window_size = Vector2i(1024, 800);
 };

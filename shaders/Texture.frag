@@ -1,52 +1,50 @@
 #version 330
 
-uniform vec3 u_cam_pos;
-uniform vec3 u_light_pos;
-uniform vec3 u_light_intensity;
+// Color
+//in vec4 v_color;
 
+// Properties of the single point light
+//uniform vec3 u_light_pos[10];
+//uniform int u_light_num;
+//uniform vec3 u_light_intensity[10];
+//uniform float u_kd[10];
 uniform sampler2D u_texture_1;
+//uniform sampler2D u_texture_2;
+//uniform sampler2D u_texture_3;
+//uniform sampler2D u_texture_4;
+//uniform sampler2D u_texture_5;
+//uniform sampler2D u_texture_6;
 
-in vec4 v_position;
-in vec4 v_normal;
+// These are the inputs which are the outputs of the vertex shader.
+//in vec4 v_position;
+//in vec4 v_normal;
 in vec2 v_uv;
 
+// This is where the final pixel color is output.
+// Here, we are only interested in the first 3 dimensions (xyz).
+// The 4th entry in this vector is for "alpha blending" which we
+// do not require you to know about. For now, just set the alpha
+// to 1.
 out vec4 out_color;
 
 void main() {
-  // YOUR CODE HERE
-  
-  // (Placeholder code. You will want to replace it.)
-  	vec4 u_color = texture(u_texture_1,v_uv);
+//    vec3 n = normalize(v_normal.xyz);
+//    float ka = 0.3;
+//    vec3 Ia = v_color.xyz;
+//    vec3 ambient = ka * Ia;
+//    vec3 diffuse = vec3(0,0,0);
+//
+//    for(int i = 0; i < u_light_num; i ++){
+//        vec3 lightVec = u_light_pos[i] - v_position.xyz;
+//
+//        vec3 lightDir = normalize(lightVec);
+//
+//        float diffuseDot = dot(n, lightDir);
+//
+//
+//        diffuse += u_light_intensity[i] * max(u_kd[i],0) * max(diffuseDot, 0.0);
+//    }
 
-
-  	vec3 lightVec = u_light_pos - v_position.xyz;
-
-	vec3 lightDir = normalize(lightVec);
-
-  	vec3 n = normalize(v_normal.xyz);
-	
-	float r2 = 1.0 / dot(lightVec, lightVec);
-
-  	float diffuseDot = dot(n, lightDir);
-
-	float kd = 0.5;
-
-	vec3 diffuse = u_light_intensity * r2 * kd * max(diffuseDot, 0.0);
-
-  	vec3 Ia = u_color.xyz;// vec3(1,1,1);
-	float ka = 0.6;
-
-	vec3 ambient = ka * Ia;
-
-	float ks = 1.8;
-	float p = 16.0;
-	vec3 camVec = u_cam_pos - v_position.xyz;
-	vec3 camDir = normalize(camVec);
-	vec3 halfVec = normalize(camDir + lightDir);
-  	float specularDot = dot(n, halfVec);
-	vec3 specular = u_light_intensity * r2 * ks * pow(max(specularDot, 0.0),p);
-
-	out_color = vec4(0.5,0.5,0,1);//u_color * vec4(diffuse + ambient + specular, 1);
-
-  	out_color.a = 1;
+    out_color = texture(u_texture_1,v_uv);// * vec4(ambient + diffuse, 1);
+    out_color.a = 1.0f;
 }

@@ -28,7 +28,7 @@ set(CLOTHSIM_VIEWER_SOURCE
 
     # sound
     Audio.cpp Audio.h
-        )
+        collision/SkyBox.cpp collision/SkyBox.h)
 
 # Windows-only sources
 if(WIN32)
