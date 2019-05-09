@@ -495,6 +495,18 @@ void FireworkSimulator::initGUI(Screen *screen) {
   window->setPosition(Vector2i(15, 15));
   window->setLayout(new GroupLayout(15, 6, 14, 5));
 
+  new Label(window, "Scene", "sans-bold");
+
+  vector<std::string> scenes_combobox_names = {"Night City", ""};
+
+  {
+    ComboBox *cb = new ComboBox(window, scenes_combobox_names);
+    cb->setFontSize(14);
+    cb->setCallback(
+        [this, screen](int idx) { active_scene_idx = idx; });
+    cb->setSelectedIndex(active_scene_idx);
+  }
+
   // Firework Widget
 
   new Label(window, "Type", "sans-bold");

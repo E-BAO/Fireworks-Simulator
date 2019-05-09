@@ -165,6 +165,8 @@ private:
     SkyBox *skybox;
 
     Vector2i default_window_size = Vector2i(1024, 800);
+
+    int active_scene_idx = 0;
 };
 
 struct UserShader {
