@@ -57,6 +57,17 @@ void FireworkSimulator::load_shaders() {
 
     shaders.push_back(plane_shader);
 
+    shader_name = "Smoke";
+    shader_fname = "Smoke.frag";
+    vert_shader = m_project_root + "/shaders/Smoke.vert";
+    GLShader smoke_nanugui_shader;
+    smoke_nanugui_shader.initFromFiles(shader_name, vert_shader,
+                                       m_project_root + "/shaders/" + shader_fname);
+    hint = ShaderTypeHint::SMOKE;
+    UserShader smoke_shader(shader_name, smoke_nanugui_shader, hint);
+
+    shaders.push_back(smoke_shader);
+
 }
 
 FireworkSimulator::FireworkSimulator(std::string project_root, Screen *screen) : m_project_root(project_root) {
@@ -151,7 +162,6 @@ void FireworkSimulator::drawContents() {
     shader0.bind();
     shader0.setUniform("u_model", model);
     shader0.setUniform("u_view_projection", viewProjection);
-    shader0.setUniform("u_view_projection", viewProjection);
 
     int light_size = min((int)MAX_LIGHT_NUM,(int)fire_lights.size());
     shader0.setUniform("u_light_num", light_size, false);
@@ -198,7 +208,7 @@ void FireworkSimulator::drawContents() {
       }
     }
 
-    // Bind the active shader
+    // Bind the fireworks shader
 
   const UserShader &active_shader = shaders[0];
 
@@ -208,11 +218,22 @@ void FireworkSimulator::drawContents() {
   shader.setUniform("u_model", model);
   shader.setUniform("u_view_projection", viewProjection);
 
-  drawWireframe(shader);
+  drawFireworks(shader);
 
+    // Bind the smokes shader
+
+    const UserShader &smoke_s = shaders[2];
+
+    GLShader smoke_shader = smoke_s.nanogui_shader;
+    smoke_shader.bind();
+
+    smoke_shader.setUniform("u_model", model);
+    smoke_shader.setUniform("u_view_projection", viewProjection);
+
+    drawSmokes(smoke_shader);
 }
 
-void FireworkSimulator::drawWireframe(GLShader &shader) {
+void FireworkSimulator::drawFireworks(GLShader &shader) {
 
   int num_particles = 0;
 
@@ -320,38 +341,46 @@ void FireworkSimulator::drawWireframe(GLShader &shader) {
     }
   }
 
-  for (auto s: smokes) {
-    if (s->status == DEAD){
-      continue;
+
+}
+
+void FireworkSimulator::drawSmokes(GLShader &shader){
+    int num_particles = 0;
+
+    MatrixXf positions;
+    MatrixXf colors;
+    MatrixXf particle_sizes;
+    MatrixXf blink_states;
+
+    for (auto s: smokes) {
+        if (s->status == DEAD){
+            continue;
+        }
+
+        if (s->status == LIVING) {
+            num_particles = s->particles.size();
+
+            positions.resize(4, num_particles);
+            colors.resize(4, num_particles);
+            particle_sizes.resize(1, num_particles);
+            blink_states.resize(1, num_particles);
+
+            for (int i = 0; i < num_particles; i++) {
+                SmokeParticle &p = s->particles[i];
+                Vector3D pos = p.position;
+                positions.col(i) << pos.x, pos.y, pos.z, 1.0;
+                particle_sizes.col(i) << s->particle_size;
+                int blinkval = 1;
+                blink_states.col(i) << blinkval;
+            }
+
+            nanogui::Color s_color = s->color;
+            shader.setUniform("u_color", s->color, false);
+            shader.uploadAttrib("in_position", positions, false);
+            shader.uploadAttrib("in_particle_size", particle_sizes, false);
+            shader.drawArray(GL_POINTS, 0, num_particles);
+        }
     }
-
-    if (s->status == LIVING) {
-      num_particles = s->particles.size();
-
-      positions.resize(4, num_particles);
-      colors.resize(4, num_particles);
-      particle_sizes.resize(1, num_particles);
-      blink_states.resize(1, num_particles);
-
-      for (int i = 0; i < num_particles; i++) {
-        SmokeParticle &p = s->particles[i];
-        Vector3D pos = p.position;
-        positions.col(i) << pos.x, pos.y, pos.z, 1.0;
-        particle_sizes.col(i) << s->particle_size;
-        int blinkval = 1;
-        blink_states.col(i) << blinkval;
-      }
-
-      nanogui::Color s_color = s->color;
-      shader.setUniform("u_color", s->color, false);
-      shader.uploadAttrib("in_position", positions, false);
-      shader.uploadAttrib("in_particle_size", particle_sizes, false);
-      shader.uploadAttrib("in_blink", blink_states, false);
-      shader.drawArray(GL_POINTS, 0, num_particles);
-    }
-  }
-
-
 }
 
 void FireworkSimulator::initGUI(Screen *screen) {
@@ -728,7 +757,19 @@ bool FireworkSimulator::keyCallbackEvent(int key, int scancode, int action,
         fireworks.push_back(f);
         drawContents();
         break;
+
     }
+  }
+
+  if(action == GLFW_REPEAT){
+      switch (key) {
+          case GLFW_KEY_LEFT:
+              camera.rotate_by(0, 30 * (PI / screen_w));
+              break;
+          case GLFW_KEY_RIGHT:
+              camera.rotate_by(0, -30 * (PI / screen_w));
+              break;
+      }
   }
 
   return true;

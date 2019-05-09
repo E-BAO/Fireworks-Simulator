@@ -18,7 +18,7 @@ using namespace nanogui;
 
 struct UserShader;
 
-enum ShaderTypeHint { SIMPLE = 0, NORMALS = 1, PHONG = 2, PLANE = 3 };
+enum ShaderTypeHint { SIMPLE = 0, NORMALS = 1, PHONG = 2, PLANE = 3, SMOKE = 4 };
 
 struct Light{
     Vector3D pos;
@@ -54,7 +54,9 @@ private:
     // Default simulation values
     vector<Firework*> fireworks;
     vector<Smoke*> smokes;
-    void drawWireframe(GLShader &shader);
+    void drawFireworks(GLShader &shader);
+    void drawSmokes(GLShader &shader);
+
     vector<Light> fire_lights;
 
     // File management
