@@ -14,7 +14,6 @@ Smoke::Smoke(Vector3D startPos, Vector3D velocity, float density, float particle
   for (SmokeParticle &p: particles) {
     // initialize smoke particles
     p.position = startPos + rand_pos();
-    cout << p.position << endl;
     p.velocity = velocity / 5.;
   }
 

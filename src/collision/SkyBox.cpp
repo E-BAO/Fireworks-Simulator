@@ -7,8 +7,8 @@
 SkyBox::SkyBox(Vector3D center, float dist){
     float xmin = center.x - dist;
     float xmax = center.x + dist;
-    float ymin = center.y;// - dist;
-    float ymax = center.y + 2.0 * dist;
+    float ymin = center.y ;//- dist;
+    float ymax = center.y + 2 * dist;
     float zmin = center.z - dist;
     float zmax = center.z + dist;
 
@@ -60,6 +60,7 @@ void SkyBox::render(GLShader &shader) {
     int num_tris = 12;
     MatrixXf positions(3, num_tris * 3);
     MatrixXf uvs(2, num_tris * 3);
+    MatrixXf normals(3, num_tris * 3);
 
     positions.col(0) << faces[0][0].x(), faces[0][0].y(), faces[0][0].z();
     positions.col(1) << faces[0][1].x(), faces[0][1].y(), faces[0][1].z();
@@ -163,10 +164,35 @@ void SkyBox::render(GLShader &shader) {
     uvs.col(34) << 0.5,0.67;
     uvs.col(35) << 0.5,1.0;
 
+    for(int i = 0; i < 6; i ++){
+        normals.col(0 * 6 + i) << 0,0,1;
+    }
+
+    for(int i = 0; i < 6; i ++){
+        normals.col(1 * 6 + i) << 0,0,-1;
+    }
+
+    for(int i = 0; i < 6; i ++){
+        normals.col(2 * 6 + i) << 1,0,0;
+    }
+
+    for(int i = 0; i < 6; i ++){
+        normals.col(3 * 6 + i) << -1,0,0;
+    }
+
+    for(int i = 0; i < 6; i ++){
+        normals.col(4 * 6 + i) << 0,-1,0;
+    }
+
+    for(int i = 0; i < 6; i ++){
+        normals.col(5 * 6 + i) << 0,1,0;
+    }
 
     shader.uploadAttrib("in_position", positions);
     shader.uploadAttrib("in_uv", uvs, false);
-
+    if (shader.attrib("in_normal", false) != -1) {
+        shader.uploadAttrib("in_normal", normals);
+    }
     shader.drawArray(GL_TRIANGLES, 0, 12 * 3);
 }
 

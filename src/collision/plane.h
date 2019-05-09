@@ -12,6 +12,8 @@ using namespace nanogui;
 using namespace CGL;
 using namespace std;
 
+#define SKY_BOX_SIZE 3
+
 struct Plane : public CollisionObject {
 public:
   Plane(const Vector3D &point, const Vector3D &normal, double friction)

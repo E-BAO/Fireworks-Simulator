@@ -33,27 +33,26 @@ void Plane::render(GLShader &shader) {
 
   MatrixXf positions(3, 4);
   MatrixXf normals(3, 4);
-  MatrixXf blink_states = MatrixXf::Ones(1, 4);
 
-  Vector3f vec_1 = sPoint + 2 * (sCross + sParallel);
-  Vector3f vec_2 = sPoint + 2 * (sCross - sParallel);
-  Vector3f vec_3 = sPoint + 2 * (-sCross + sParallel);
-  Vector3f vec_4 = sPoint + 2 * (-sCross - sParallel);
+  MatrixXf uvs(2, 4);
 
-//    std::cout<<"vec1 "<< vec_1.x()<<" "<<vec_1.y() << " " << vec_1.z() << std::endl;
-//    std::cout<<"vec2 "<< vec_2.x()<<" "<<vec_2.y() << " " << vec_2.z() << std::endl;
-//    std::cout<<"vec3 "<< vec_3.x()<<" "<<vec_3.y() << " " << vec_3.z() << std::endl;
-//    std::cout<<"vec4 "<< vec_4.x()<<" "<<vec_4.y() << " " << vec_4.z() << std::endl;
+  float length = 3.0f;
 
-  positions.col(0) << sPoint + 2 * (sCross + sParallel);
-  positions.col(1) << sPoint + 2 * (sCross - sParallel);
-  positions.col(2) << sPoint + 2 * (-sCross + sParallel);
-  positions.col(3) << sPoint + 2 * (-sCross - sParallel);
+  positions.col(0) << -length, -length, length;
+  positions.col(1) << -length, -length, -length;
+  positions.col(2) << length, -length, length;
+  positions.col(3) << length, -length, -length;
 
   normals.col(0) << sNormal;
   normals.col(1) << sNormal;
   normals.col(2) << sNormal;
   normals.col(3) << sNormal;
+
+    //bottom
+    uvs.col(0) << 0.25,0.67;
+    uvs.col(1) << 0.25,1.0;
+    uvs.col(2) << 0.5,0.67;
+    uvs.col(3) << 0.5,1.0;
 
   if (shader.uniform("u_color", false) != -1) {
       shader.setUniform("u_color", color);
@@ -62,6 +61,7 @@ void Plane::render(GLShader &shader) {
   if (shader.attrib("in_normal", false) != -1) {
       shader.uploadAttrib("in_normal", normals);
   }
+  shader.uploadAttrib("in_uv", uvs);
 
   shader.drawArray(GL_TRIANGLE_STRIP, 0, 4);
 }

@@ -133,15 +133,12 @@ void FireworkSimulator::load_textures() {
 //    glGenTextures(6, &m_gl_texture_6);
 
     m_gl_texture_1_size = load_texture(1, m_gl_texture_1, (m_project_root + "/textures/sky_box/nec_city.jpg").c_str());
-    m_gl_texture_2_size = load_texture(2, m_gl_texture_2, (m_project_root + "/textures/texture_2.png").c_str());
-    m_gl_texture_3_size = load_texture(3, m_gl_texture_3, (m_project_root + "/textures/texture_3.png").c_str());
-//    m_gl_texture_4_size = load_texture(4, m_gl_texture_4, (m_project_root + "/textures/texture_4.png").c_str());
+    m_gl_texture_2_size = load_texture(2, m_gl_texture_2, (m_project_root + "/textures/sky_box/ae.jpg").c_str());
+    m_gl_texture_3_size = load_texture(3, m_gl_texture_3, (m_project_root + "/textures/sky_box/vr.jpg").c_str());
 
     std::cout << "Texture 1 loaded with size: " << m_gl_texture_1_size << std::endl;
     std::cout << "Texture 2 loaded with size: " << m_gl_texture_2_size << std::endl;
     std::cout << "Texture 3 loaded with size: " << m_gl_texture_3_size << std::endl;
-//    std::cout << "Texture 4 loaded with size: " << m_gl_texture_4_size << std::endl;
-
 
 }
 
@@ -216,7 +213,7 @@ void FireworkSimulator::init() {
   collision_objects = new vector<CollisionObject *>();
 
   //init plane
-  Vector3D point(0, 0, 0), normal(0, 1, 0);
+  Vector3D point(0, -3.0, 0), normal(0, 1, 0);
   double friction = 0.5;
 
   plane = new Plane(point, normal, friction);
@@ -231,6 +228,7 @@ void FireworkSimulator::drawContents() {
 //    glEnable(GL_DEPTH_TEST);
 
 
+    int light_size = min((int)MAX_LIGHT_NUM,(int)fire_lights.size());
 
     // Prepare the camera projection matrix
 
@@ -242,33 +240,7 @@ void FireworkSimulator::drawContents() {
 
     Matrix4f viewProjection = projection * view;
 
-
-    // Bind the skybox shader
-    const UserShader &skybox_u_shader = shaders[3];
-
-    GLShader skybox_shader = skybox_u_shader.nanogui_shader;
-    skybox_shader.bind();
-    skybox_shader.setUniform("u_model", model);
-    skybox_shader.setUniform("u_view_projection", viewProjection);
-    skybox_shader.setUniform("u_view_projection", viewProjection);
-
-    skybox_shader.setUniform("u_texture_1", 1, false);
-//    skybox_shader.setUniform("u_texture_2", 2, false);
-//    skybox_shader.setUniform("u_texture_3", 3, false);
-    skybox_shader.setUniform("u_texture_1_size", Vector2f(m_gl_texture_1_size.x, m_gl_texture_1_size.y), false);
-
-    skybox->render(skybox_shader);
-
-    const UserShader &plane_shader = shaders[1];
-
-    GLShader shader0 = plane_shader.nanogui_shader;
-    shader0.bind();
-    shader0.setUniform("u_model", model);
-    shader0.setUniform("u_view_projection", viewProjection);
-
-    int light_size = min((int)MAX_LIGHT_NUM,(int)fire_lights.size());
-    shader0.setUniform("u_light_num", light_size, false);
-
+    // Prepare lights
     float light_pos[light_size][3];
     float light_intensity[light_size][3];
     float light_kd[light_size];
@@ -286,9 +258,40 @@ void FireworkSimulator::drawContents() {
         light_kd[i] = fire_lights[i].kd;
     }
 
+
+    // Bind the skybox shader
+    const UserShader &skybox_u_shader = shaders[1];
+
+    GLShader skybox_shader = skybox_u_shader.nanogui_shader;
+    skybox_shader.bind();
+    skybox_shader.setUniform("u_model", model);
+    skybox_shader.setUniform("u_view_projection", viewProjection);
+    skybox_shader.setUniform("u_view_projection", viewProjection);
+
+    skybox_shader.setUniform("u_texture_1", active_scene_idx + 1, false);
+
+    skybox_shader.setUniform("u_light_num", light_size, false);
+
+    glUniform3fv(glGetUniformLocation(skybox_shader.mProgramShader, "u_light_pos"), light_size, (const GLfloat*)light_pos);
+    glUniform3fv(glGetUniformLocation(skybox_shader.mProgramShader, "u_light_intensity"), light_size, (const GLfloat*)light_intensity);
+    glUniform1fv(glGetUniformLocation(skybox_shader.mProgramShader, "u_kd"), light_size, (const GLfloat*)light_kd);
+
+    skybox->render(skybox_shader);
+
+    const UserShader &plane_shader = shaders[1];
+
+    GLShader shader0 = plane_shader.nanogui_shader;
+    shader0.bind();
+    shader0.setUniform("u_model", model);
+    shader0.setUniform("u_view_projection", viewProjection);
+    shader0.setUniform("u_texture_1", active_scene_idx + 1, false);
+
+    shader0.setUniform("u_light_num", light_size, false);
+
     glUniform3fv(glGetUniformLocation(shader0.mProgramShader, "u_light_pos"), light_size, (const GLfloat*)light_pos);
     glUniform3fv(glGetUniformLocation(shader0.mProgramShader, "u_light_intensity"), light_size, (const GLfloat*)light_intensity);
     glUniform1fv(glGetUniformLocation(shader0.mProgramShader, "u_kd"), light_size, (const GLfloat*)light_kd);
+
     fire_lights.resize(0);
 
     for (CollisionObject *co : *collision_objects) {
