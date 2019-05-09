@@ -84,8 +84,8 @@ private:
     bool enable_trail = false;
     float trail_damping = 0.92;
     FireworkShape shape = FireworkShape::DISPERSED;
-    int smoke_frame = 15;
-    int smoke_skip = 10;
+    int smoke_frame = 20;
+    int smoke_skip = 15;
 
 
     vector<CollisionObject *> *collision_objects;
