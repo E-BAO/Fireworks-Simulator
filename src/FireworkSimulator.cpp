@@ -150,6 +150,7 @@ FireworkSimulator::FireworkSimulator(std::string project_root, Screen *screen) :
 
   glEnable(GL_PROGRAM_POINT_SIZE);
   glEnable(GL_DEPTH_TEST);
+    glCullFace(GL_BACK);
 }
 
 FireworkSimulator::~FireworkSimulator() {
@@ -188,7 +189,7 @@ void FireworkSimulator::init() {
 
   CGL::Vector3D target(avg_pm_position.x, avg_pm_position.y / 2,
                        avg_pm_position.z);
-  CGL::Vector3D c_dir(0., 0., 0.);
+  CGL::Vector3D c_dir(0., 0., -1.);
 //    canonical_view_distance = max(cloth->width, cloth->height) * 0.9;
   canonical_view_distance = 0.9;
   scroll_rate = canonical_view_distance / 10;
