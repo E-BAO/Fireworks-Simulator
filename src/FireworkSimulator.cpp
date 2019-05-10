@@ -126,19 +126,20 @@ void load_cubemap(int frame_idx, GLuint handle, const std::vector<std::string>& 
 
 void FireworkSimulator::load_textures() {
     glGenTextures(1, &m_gl_texture_1);
-    glGenTextures(2, &m_gl_texture_2);
-    glGenTextures(3, &m_gl_texture_3);
-//    glGenTextures(4, &m_gl_texture_4);
-//    glGenTextures(5, &m_gl_texture_5);
-//    glGenTextures(6, &m_gl_texture_6);
+    glGenTextures(1, &m_gl_texture_2);
+    glGenTextures(1, &m_gl_texture_3);
+    //glGenTextures(1, &m_gl_texture_4);
 
-    m_gl_texture_1_size = load_texture(1, m_gl_texture_1, (m_project_root + "/textures/sky_box/nec_city.jpg").c_str());
-    m_gl_texture_2_size = load_texture(2, m_gl_texture_2, (m_project_root + "/textures/sky_box/ae.jpg").c_str());
-    m_gl_texture_3_size = load_texture(3, m_gl_texture_3, (m_project_root + "/textures/sky_box/vr.jpg").c_str());
+    m_gl_texture_1_size = load_texture(1, m_gl_texture_1, (m_project_root + "/textures/sky_box/cybercity_3000.jpg").c_str());
+    m_gl_texture_2_size = load_texture(2, m_gl_texture_2, (m_project_root + "/textures/sky_box/moonlit_winter.jpg").c_str());
+    m_gl_texture_3_size = load_texture(3, m_gl_texture_3, (m_project_root + "/textures/sky_box/celestial_canyons.jpg").c_str());
+    //m_gl_texture_4_size = load_texture(4, m_gl_texture_4, (m_project_root + "/textures/sky_box/aurora_rising.jpg").c_str());
+
 
     std::cout << "Texture 1 loaded with size: " << m_gl_texture_1_size << std::endl;
     std::cout << "Texture 2 loaded with size: " << m_gl_texture_2_size << std::endl;
     std::cout << "Texture 3 loaded with size: " << m_gl_texture_3_size << std::endl;
+    //std::cout << "Texture 4 loaded with size: " << m_gl_texture_4_size << std::endl;
 
 }
 
@@ -158,7 +159,7 @@ FireworkSimulator::~FireworkSimulator() {
     glDeleteTextures(1, &m_gl_texture_1);
     glDeleteTextures(1, &m_gl_texture_2);
     glDeleteTextures(1, &m_gl_texture_3);
-//    glDeleteTextures(1, &m_gl_texture_4);
+    //glDeleteTextures(1, &m_gl_texture_4);
 
     if (collision_objects) delete collision_objects;
 }
@@ -219,7 +220,6 @@ void FireworkSimulator::init() {
   plane = new Plane(point, normal, friction);
   collision_objects->push_back(plane);
 
-
   skybox = new SkyBox(point, 3.0f);
 }
 
@@ -258,7 +258,6 @@ void FireworkSimulator::drawContents() {
         light_kd[i] = fire_lights[i].kd;
     }
 
-
     // Bind the skybox shader
     const UserShader &skybox_u_shader = shaders[1];
 
@@ -277,7 +276,6 @@ void FireworkSimulator::drawContents() {
     glUniform1fv(glGetUniformLocation(skybox_shader.mProgramShader, "u_kd"), light_size, (const GLfloat*)light_kd);
 
     skybox->render(skybox_shader);
-
     const UserShader &plane_shader = shaders[1];
 
     GLShader shader0 = plane_shader.nanogui_shader;
@@ -325,7 +323,6 @@ void FireworkSimulator::drawContents() {
   shader.setUniform("u_view_projection", viewProjection);
 
   drawFireworks(shader);
-
     // Bind the smokes shader
 
     const UserShader &smoke_s = shaders[2];
@@ -349,7 +346,7 @@ void FireworkSimulator::drawFireworks(GLShader &shader) {
   MatrixXf blink_states;
 
   for (auto f: fireworks) {
-    if (f->status == DIED){
+      if (f->status == DIED){
       continue;
     }
 
@@ -381,6 +378,7 @@ void FireworkSimulator::drawFireworks(GLShader &shader) {
           shader.uploadAttrib("in_particle_size", particle_sizes, false);
           shader.uploadAttrib("in_blink", blink_states, false);
           shader.drawArray(GL_POINTS, 0, num_particles);
+
         }
       } else {
         for (int i = 0; i < num_particles; i++) {
@@ -500,7 +498,11 @@ void FireworkSimulator::initGUI(Screen *screen) {
 
   new Label(window, "Scene", "sans-bold");
 
-  vector<std::string> scenes_combobox_names = {"Night City", ""};
+  vector<std::string> scenes_combobox_names = {
+          "CyberCity 3000",
+          "Moonlit Winter",};
+          //"Celestial Canyons",
+          //"Aurora Rising", };
 
   {
     ComboBox *cb = new ComboBox(window, scenes_combobox_names);
