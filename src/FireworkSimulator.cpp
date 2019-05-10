@@ -214,13 +214,13 @@ void FireworkSimulator::init() {
   collision_objects = new vector<CollisionObject *>();
 
   //init plane
-  Vector3D point(0, -3.0, 0), normal(0, 1, 0);
+  Vector3D point(0, -SKY_BOX_SIZE, 0), normal(0, 1, 0);
   double friction = 0.5;
 
   plane = new Plane(point, normal, friction);
   collision_objects->push_back(plane);
 
-  skybox = new SkyBox(point, 3.0f);
+  skybox = new SkyBox(point, SKY_BOX_SIZE);
 }
 
 
@@ -278,6 +278,7 @@ void FireworkSimulator::drawContents() {
     skybox->render(skybox_shader);
     const UserShader &plane_shader = shaders[1];
 
+    /*
     GLShader shader0 = plane_shader.nanogui_shader;
     shader0.bind();
     shader0.setUniform("u_model", model);
@@ -290,11 +291,12 @@ void FireworkSimulator::drawContents() {
     glUniform3fv(glGetUniformLocation(shader0.mProgramShader, "u_light_intensity"), light_size, (const GLfloat*)light_intensity);
     glUniform1fv(glGetUniformLocation(shader0.mProgramShader, "u_kd"), light_size, (const GLfloat*)light_kd);
 
-    fire_lights.resize(0);
-
     for (CollisionObject *co : *collision_objects) {
         co->render(shader0);
     }
+     */
+
+    fire_lights.resize(0);
 
     if (!is_paused) {
         vector<Vector3D> external_accelerations = {gravity};

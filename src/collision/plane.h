@@ -21,10 +21,17 @@ public:
     Vector3D v_parallel(normal.y - normal.z, normal.z - normal.x, normal.x - normal.y);
     v_parallel.normalize();
     Vector3D v_cross = cross(normal, v_parallel);
-    p0 = point + 2 * ( v_cross + v_parallel);
-    p1 = point + 2 * ( v_cross - v_parallel);
-    p2 = point + 2 * (-v_cross + v_parallel);
-    p3 = point + 2 * (-v_cross - v_parallel);
+//    p0 = point + 2 * ( v_cross + v_parallel);
+//    p1 = point + 2 * ( v_cross - v_parallel);
+//    p2 = point + 2 * (-v_cross + v_parallel);
+//    p3 = point + 2 * (-v_cross - v_parallel);
+
+      float length = SKY_BOX_SIZE;
+
+      p0 = Vector3D(-length, -length, length);
+      p1 = Vector3D(-length, -length, -length);
+      p2 = Vector3D(length, -length, length);
+      p3 = Vector3D(length, -length, -length);
   }
 
   void render(GLShader &shader);

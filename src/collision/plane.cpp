@@ -36,12 +36,10 @@ void Plane::render(GLShader &shader) {
 
   MatrixXf uvs(2, 4);
 
-  float length = 3.0f;
-
-  positions.col(0) << -length, -length, length;
-  positions.col(1) << -length, -length, -length;
-  positions.col(2) << length, -length, length;
-  positions.col(3) << length, -length, -length;
+  positions.col(0) << p0.x, p0.y, p0.z;
+  positions.col(1) << p1.x, p1.y, p1.z;
+  positions.col(2) << p2.x, p2.y, p2.z;
+  positions.col(3) << p3.x, p3.y, p3.z;
 
   normals.col(0) << sNormal;
   normals.col(1) << sNormal;
