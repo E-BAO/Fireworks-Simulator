@@ -7,7 +7,6 @@ cmake_install.cmake
 install_manifest.txt
 compile_commands.json
 CTestTestfile.cmake
-textures
 scene
 .DS_Store
 cmake-build-debug
