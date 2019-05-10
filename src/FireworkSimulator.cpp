@@ -500,8 +500,8 @@ void FireworkSimulator::initGUI(Screen *screen) {
 
   vector<std::string> scenes_combobox_names = {
           "CyberCity 3000",
-          "Moonlit Winter",
-          "Aurora Rising",};
+          "Moonlit Winter",};
+          //"Aurora Rising",};
           //"Celestial Canyons",};
 
 
